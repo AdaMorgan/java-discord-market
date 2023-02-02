@@ -11,7 +11,7 @@ import java.util.Arrays;
 
 public class Main {
     public static void main(String[] args) {
-        JDABuilder.create("OTY4MDEwMTk0Nzc4OTkyNjcw.G5NtzG.I9TseH3v0JOIvtWkGIj8tdZIgk3a6icOkZ8cmQ", Arrays.asList(INTENTS))
+        JDABuilder.create("OTY4MDEwMTk0Nzc4OTkyNjcw.GuC79j.OTRo-BXU81gjAAcwdkUkq1LNXG6SXDdsoJCI_w", Arrays.asList(INTENTS))
                 .setActivity(Activity.playing("server"))
                 .setStatus(OnlineStatus.ONLINE)
                 .setMemberCachePolicy(MemberCachePolicy.NONE)
