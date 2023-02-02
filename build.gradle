@@ -8,15 +8,19 @@ version '1.0-SNAPSHOT'
 repositories {
     mavenCentral()
 }
-
 dependencies {
-    implementation "net.dv8tion:JDA:5.0.0-beta.3"
-    implementation 'com.google.code.gson:gson:2.10.1'
+    implementation group: 'net.dv8tion', name: 'JDA', version: '5.0.0-beta.3'
+    implementation group: 'com.google.code.gson', name: 'gson', version: '2.10.1'
 
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+
+    testImplementation group: 'junit', name: 'junit', version: '4.13.1'
 }
+
 
 test {
     useJUnitPlatform()
+    testLogging.showStandardStreams = true
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
 }
