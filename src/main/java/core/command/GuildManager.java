@@ -1,14 +1,13 @@
 package core.command;
 
-import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.events.guild.GuildReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 
-import java.awt.*;
 
+// TODO: автосоздание роли
 public class GuildManager extends ListenerAdapter {
 
     public static long CATEGORY_ID, CHANNEL_ID = 0L;
@@ -23,22 +22,11 @@ public class GuildManager extends ListenerAdapter {
 
     @Override
     public void onGuildReady(@NotNull GuildReadyEvent event) {
-        if (!getRoleID(event))
-            event.getGuild().createRole().setName(NEW).setColor(Color.cyan).queue();
-
         if (getCategoryID(event) == UNDEFINED)
             event.getGuild().createCategory(CATEGORY).complete();
 
         if (getChannelID(event) == UNDEFINED)
             event.getGuild().getCategoryById(getCategoryID(event)).createTextChannel(CHANNEL).complete();
-    }
-
-    private boolean getRoleID(GuildReadyEvent event) {
-        for (Role role : event.getGuild().getRoles())
-            if (role.getName().equals(NEW))
-                return true;
-
-        return false;
     }
 
     private long getCategoryID(GuildReadyEvent event) {

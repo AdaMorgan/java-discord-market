@@ -1,6 +1,7 @@
 package core;
 
 import core.command.GuildManager;
+import core.message.MessageEditor;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
