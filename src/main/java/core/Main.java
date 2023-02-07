@@ -12,7 +12,7 @@ import java.util.Arrays;
 
 public class Main {
     public static void main(String[] args) {
-        JDABuilder.create("", Arrays.asList(INTENTS))
+        JDABuilder.create("OTY4MDEwMTk0Nzc4OTkyNjcw.GKrV0b.98XVlaiSeK6ncFLh3H9Xikt4ruuN3VdyKFDxn0", Arrays.asList(INTENTS))
                 .setActivity(Activity.playing("server"))
                 .setStatus(OnlineStatus.ONLINE)
                 .setMemberCachePolicy(MemberCachePolicy.NONE)
@@ -28,6 +28,6 @@ public class Main {
             GatewayIntent.GUILD_MESSAGES,
             GatewayIntent.GUILD_MEMBERS,
             GatewayIntent.GUILD_MESSAGE_REACTIONS,
-            GatewayIntent.GUILD_PRESENCES,
+            GatewayIntent.GUILD_PRESENCES
     };
 }

@@ -1,6 +1,7 @@
 package core.message;
 
 import core.Timer;
+import core.command.GuildManager;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -24,7 +25,7 @@ public class MessageEditor extends ListenerAdapter {
     public void onMessageReceived(MessageReceivedEvent event) {
         if (event.getMessage().getContentRaw().equalsIgnoreCase("test")) {
             this.AUTHOR_ID = event.getAuthor().getIdLong();
-            event.getChannel().sendMessage("@root").setEmbeds(messageEmbed(this.TIME = 5, 0, "NaN")).queue(message -> {
+            event.getChannel().sendMessage("<@&1072447833153736784>").setEmbeds(messageEmbed(this.TIME = 5, 0, "NaN")).queue(message -> {
                 this.MESSAGE_ID = message.getIdLong();
                 message.addReaction(Emoji.fromUnicode("\uD83D\uDFE9")).queue();
                 message.addReaction(Emoji.fromUnicode("\uD83D\uDFE8")).queue();
