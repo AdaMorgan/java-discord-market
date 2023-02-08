@@ -1,6 +1,7 @@
 package core;
 
 import core.command.GuildManager;
+import core.config.Config;
 import core.message.MessageEditor;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -12,7 +13,7 @@ import java.util.Arrays;
 
 public class Main {
     public static void main(String[] args) {
-        JDABuilder.create("OTY4MDEwMTk0Nzc4OTkyNjcw.GKrV0b.98XVlaiSeK6ncFLh3H9Xikt4ruuN3VdyKFDxn0", Arrays.asList(INTENTS))
+        JDABuilder.create(Config.getToken(), Arrays.asList(INTENTS))
                 .setActivity(Activity.playing("server"))
                 .setStatus(OnlineStatus.ONLINE)
                 .setMemberCachePolicy(MemberCachePolicy.NONE)

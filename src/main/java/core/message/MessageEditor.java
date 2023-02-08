@@ -1,7 +1,6 @@
 package core.message;
 
 import core.Timer;
-import core.command.GuildManager;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -30,6 +29,7 @@ public class MessageEditor extends ListenerAdapter {
                 message.addReaction(Emoji.fromUnicode("\uD83D\uDFE9")).queue();
                 message.addReaction(Emoji.fromUnicode("\uD83D\uDFE8")).queue();
                 message.addReaction(Emoji.fromUnicode("\uD83D\uDFE5")).queue();
+                message.addReaction(Emoji.fromUnicode("\uD83D\uDFE1")).queue();
             });
         }
     }
@@ -38,24 +38,30 @@ public class MessageEditor extends ListenerAdapter {
     public void onMessageReactionAdd(@NotNull MessageReactionAddEvent event) {
         if (!event.getUser().isBot()) {
             event.getReaction().removeReaction(event.getUser()).queue();
-//            if (event.getUserIdLong() == this.AUTHOR_ID)
-//                event.getUser().openPrivateChannel().complete().sendMessage("AUTHOR!").queue();
+            if (event.getUserIdLong() == this.AUTHOR_ID)
+                event.getUser().openPrivateChannel().complete().sendMessage("AUTHOR!").queue();
 
             if (event.getUserIdLong() == this.LEADER_ID)
                 event.getUser().openPrivateChannel().complete().sendMessage("LEADER!").queue();
 
-            // event.getUserIdLong() != this.AUTHOR_ID &&
-            if (event.getUserIdLong() != this.LEADER_ID) {
+            if (event.getUserIdLong() != this.AUTHOR_ID && event.getUserIdLong() != this.LEADER_ID) {
                 this.LEADER_ID = event.getUserIdLong();
-
-                switch (event.getEmoji().getAsReactionCode()) {
-                    case "\uD83D\uDFE9" -> editMessageEmbeds(event, this.CURRENT += 1);
-                    case "\uD83D\uDFE8" -> editMessageEmbeds(event, this.CURRENT += 10);
-                    case "\uD83D\uDFE5" -> editMessageEmbeds(event, this.CURRENT += 100);
-                    //case "" -> leaveAuction();
-                }
+                getEmojiReaction(event);
             }
         }
+    }
+
+    private void getEmojiReaction(MessageReactionAddEvent event) {
+        switch (event.getEmoji().getAsReactionCode()) {
+            case "\uD83D\uDFE9" -> editMessageEmbeds(event, this.CURRENT += 1);
+            case "\uD83D\uDFE8" -> editMessageEmbeds(event, this.CURRENT += 10);
+            case "\uD83D\uDFE5" -> editMessageEmbeds(event, this.CURRENT += 100);
+            case "\uD83D\uDFE1" -> onAuctionLeave();
+        }
+    }
+
+    private void onAuctionLeave() {
+        System.out.println("Work!!!");
     }
 
     private void editMessageEmbeds(MessageReactionAddEvent event, int count) {

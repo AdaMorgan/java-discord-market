@@ -1,17 +1,10 @@
 package core.command;
 
-import jdk.jfr.MetadataDefinition;
-import kotlin.DeprecatedSinceKotlin;
-import kotlin.Metadata;
-import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
-import net.dv8tion.jda.api.events.channel.GenericChannelEvent;
 import net.dv8tion.jda.api.events.guild.GuildReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import org.intellij.lang.annotations.RegExp;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.TestOnly;
 
 import java.awt.*;
 
@@ -29,9 +22,6 @@ public class GuildManager extends ListenerAdapter {
     private final String END = "Ending Soon";
 
     public String NEW_ID, END_ID;
-
-    private final Color BLUE = new Color(123, 227, 221);
-    private final Color RED = new Color(205, 18, 71);
 
     @Override
     public void onGuildReady(@NotNull GuildReadyEvent event) {
@@ -57,13 +47,13 @@ public class GuildManager extends ListenerAdapter {
     }
 
     private long getChannelID(GuildReadyEvent event) {
-        for (Channel channel : event.getGuild().getCategoryById(getCategoryID(event)).getChannels())
+        for (Channel channel : event.getGuild().getChannels())
             if (!channel.getName().equals(CHANNEL))
                 return CHANNEL_ID = Long.parseLong(channel.getId());
 
         return UNDEFINED;
     }
-//
+
 //    public long getRoleID(GuildReadyEvent event, String name) {
 //        for (Role role : event.getGuild().getRoles())
 //            if (role.getName().equals(name))

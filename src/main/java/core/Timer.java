@@ -35,7 +35,6 @@ public class Timer {
         return getDateStop(count).getHours() - getDateStart().getHours();
     }
 
-    @TestOnly
     private String getTimerLeft(int count) {
         return getTimeToHours(count);
     }
