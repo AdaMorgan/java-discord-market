@@ -7,7 +7,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class Controller {
-    public void Controller() {
+    public Controller() {
         AtomicReference<ScheduledFuture<?>> reference = new AtomicReference<>();
         AtomicInteger integer = new AtomicInteger();
         reference.set(Executors.newScheduledThreadPool(1).scheduleWithFixedDelay(() -> {
