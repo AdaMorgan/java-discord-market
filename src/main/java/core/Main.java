@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 public class Main {
     public static void main(String[] args) {

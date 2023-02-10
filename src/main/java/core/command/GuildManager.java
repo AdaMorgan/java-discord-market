@@ -6,9 +6,6 @@ import net.dv8tion.jda.api.events.guild.GuildReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 
-import java.awt.*;
-
-
 // TODO: автосоздание роли
 public class GuildManager extends ListenerAdapter {
     private static long CATEGORY_ID, CHANNEL_ID = 0L;
