@@ -52,11 +52,13 @@ public class MessageEditor extends ListenerAdapter {
     }
 
     private void getEmojiReaction(MessageReactionAddEvent event) {
-        switch (event.getEmoji().getAsReactionCode()) {
-            case "\uD83D\uDFE9" -> editMessageEmbeds(event, this.CURRENT += 1);
-            case "\uD83D\uDFE8" -> editMessageEmbeds(event, this.CURRENT += 10);
-            case "\uD83D\uDFE5" -> editMessageEmbeds(event, this.CURRENT += 100);
-            case "\uD83D\uDFE1" -> onAuctionLeave();
+        if (event.getUser() != null) {
+            switch (event.getEmoji().getAsReactionCode()) {
+                case "\uD83D\uDFE9" -> editMessageEmbeds(event, this.CURRENT += 1, event.getUser().getName());
+                case "\uD83D\uDFE8" -> editMessageEmbeds(event, this.CURRENT += 10, event.getUser().getName());
+                case "\uD83D\uDFE5" -> editMessageEmbeds(event, this.CURRENT += 100, event.getUser().getName());
+                case "\uD83D\uDFE1" -> onAuctionLeave();
+            }
         }
     }
 
@@ -64,8 +66,8 @@ public class MessageEditor extends ListenerAdapter {
         System.out.println("Work!!!");
     }
 
-    private void editMessageEmbeds(MessageReactionAddEvent event, int count) {
-        event.getChannel().editMessageEmbedsById(this.MESSAGE_ID, messageEmbed(this.TIME, count, this.USERNAME = event.getUser().getName())).queue();
+    private void editMessageEmbeds(MessageReactionAddEvent event, int count, String name) {
+        event.getChannel().editMessageEmbedsById(this.MESSAGE_ID, messageEmbed(this.TIME, count, name)).queue();
     }
 
     private void editMessageEmbeds(MessageReceivedEvent event, int time) {

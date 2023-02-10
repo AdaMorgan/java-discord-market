@@ -1,6 +1,6 @@
 package core;
 
-import core.annotation.Database ;
+import core.annotation.Database;
 
 /*
 *
