@@ -9,7 +9,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 //Controller
 public class Controller {
-    public void Controller() {
+    public void getController() {
         AtomicReference<ScheduledFuture<?>> reference = new AtomicReference<>();
         AtomicInteger integer = new AtomicInteger();
         reference.set(Executors.newScheduledThreadPool(1).scheduleWithFixedDelay(() -> {

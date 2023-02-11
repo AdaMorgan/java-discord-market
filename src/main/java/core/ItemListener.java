@@ -1,13 +1,10 @@
 package core;
 
-import core.annotation.Database ;
-
 /*
 *
 * ItemName | ID | Stack (true or false)
 *
 */
-@Database
 public class ItemListener {
 
     private long getItemID() {
