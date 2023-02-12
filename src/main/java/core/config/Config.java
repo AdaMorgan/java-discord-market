@@ -2,7 +2,6 @@ package core.config;
 
 import com.moandjiezana.toml.Toml;
 
-import java.awt.*;
 import java.io.File;
 
 
@@ -18,11 +17,11 @@ public class Config {
         return getFile().getString("discord.token");
     }
 
-    public Color getColorBlue() {
-        return new Color(123, 227, 221);
+    public static String getHostname() {
+        return getFile().getString("database.redis.host");
     }
 
-    public Color getColorRed() {
-        return new Color(205, 18, 71);
+    public static Long getPort() {
+        return getFile().getLong("database.redis.port");
     }
 }
