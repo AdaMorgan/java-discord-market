@@ -15,6 +15,7 @@ dependencies {
     implementation group: 'com.moandjiezana.toml', name: 'toml4j', version: '0.7.2'
 
     implementation group: 'org.postgresql', name: 'postgresql', version: '42.5.3'
+    implementation group: 'io.prometheus', name: 'simpleclient', version: '0.16.0'
 
     implementation group: 'io.projectreactor', name: 'reactor-core', version: '3.5.2'
     implementation group: 'io.projectreactor', name: 'reactor-test', version: '3.5.2'
