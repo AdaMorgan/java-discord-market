@@ -2,28 +2,34 @@ package core.config;
 
 import com.moandjiezana.toml.Toml;
 
-import io.prometheus.client.Collector;
-
 import java.io.File;
 
-
-//Toml
 public class Config {
-    private static final String FILE = "config.toml";
-
     private static Toml getFile() {
-        return new Toml().read(new File(FILE));
+        return new Toml().read(new File("config.toml"));
     }
 
     public static String getToken() {
         return getFile().getString("discord.token");
     }
 
-    public static String getHostname() {
-        return getFile().getString("database.redis.host");
+    public String getDriver() {
+        return getFile().getString("database.postgres.driver");
     }
 
-    public static Long getPort() {
-        return getFile().getLong("database.redis.port");
+    public String getName() {
+        return getFile().getString("database.postgres.name");
+    }
+
+    public String getHost() {
+        return getFile().getString("database.postgres.host");
+    }
+
+    public String getUser() {
+        return getFile().getString("database.postgres.user");
+    }
+
+    public String getPassword() {
+        return getFile().getString("database.postgres.password");
     }
 }

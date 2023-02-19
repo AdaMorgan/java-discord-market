@@ -4,13 +4,10 @@ import reactor.core.publisher.Flux;
 
 import java.time.Duration;
 
-//Controller
 public class Reactor {
-    public static void main(String[] args) throws InterruptedException {
-        Flux.generate(synchronousSink -> {
-
-        }).subscribe(System.out::println);
-
-        Thread.sleep(40000);
+    public static void main(String[] args) {
+        Flux.generate(synchronous -> synchronous.next("Work!"))
+                .delayElements(Duration.ofSeconds(5))
+                .subscribe(System.out::println);
     }
 }

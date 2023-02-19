@@ -17,7 +17,7 @@ public class Timer {
     }
 
     public static String getTimer(int count) {
-        return String.format("%s %s %s", TIMER.getText(count), TIMER.getPattern(count), TIMER.getTimerLeft(count));
+        return String.format("%s %s %s", TIMER.getText(count), TIMER.getPattern(count), TIMER.getTimeToHours(count));
     }
 
     private Date getDateStop(int count) {
@@ -29,11 +29,7 @@ public class Timer {
     }
 
     private long getPeriod(int count) {
-        return getDateStop(count).getHours() - getDateStart().getHours();
-    }
-
-    private String getTimerLeft(int count) {
-        return getTimeToHours(count);
+        return getDateStop(count).getTime() - getDateStart().getTime();
     }
 
     private String getTimeToDay(int count) {

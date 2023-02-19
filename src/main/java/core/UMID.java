@@ -1,21 +1,24 @@
 package core;
 
 import java.io.Serializable;
-import java.util.concurrent.atomic.AtomicInteger;
 
 // Unique Message Identifier
 // 16-04742719
-public class UMID implements Serializable {
-
+// Check question serializable for save value ID
+public final class UMID {
     public static void main(String[] args) {
-        System.out.println(randomUMID());
+        System.out.println(getLongID());
     }
 
-    public static long randomUMID() {
-        return new AtomicInteger(0).addAndGet(1);
+    public static String getStringID() {
+        return String.format("16%s", getGenerateID());
     }
 
-    public static boolean getUMID() {
-        return false;
+    public static long getLongID() {
+        return Long.parseLong(getStringID());
+    }
+
+    private static long getGenerateID() {
+        return 1L;
     }
 }

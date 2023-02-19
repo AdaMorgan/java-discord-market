@@ -1,21 +1,14 @@
-import org.junit.BeforeClass;
-import org.junit.Test;
+import core.database.Connect;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import java.sql.SQLException;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestRuntime {
 
-    @BeforeClass
-    public static void beforeClass() {
-        System.out.println("Before class");
-    }
-
     @Test
-    public void test() {
-        assertEquals("Hello world!", 5, addition(3, 2));
-    }
-
-    public int addition(int x, int y) {
-        return x + y;
+    public void isConnect() throws SQLException {
+        assertTrue(Connect.getConnect().isValid(5000), "connection is established ");
     }
 }

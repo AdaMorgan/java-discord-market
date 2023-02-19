@@ -21,11 +21,11 @@ public class GuildManager extends ListenerAdapter {
 
     @Override
     public void onGuildReady(@NotNull GuildReadyEvent event) {
-        if (getRoleID(event, NEW) == UNDEFINED)
-            event.getGuild().createRole().setName(NEW).setColor(BLUE).queue(role -> NEW_ID = role.getId());
-
-        if (getRoleID(event, END) == UNDEFINED)
-            event.getGuild().createRole().setName(END).setColor(RED).queue(role -> END_ID = role.getId());
+//        if (getRoleID(event, NEW) == UNDEFINED)
+//            event.getGuild().createRole().setName(NEW).setColor(BLUE).queue(role -> NEW_ID = role.getId());
+//
+//        if (getRoleID(event, END) == UNDEFINED)
+//            event.getGuild().createRole().setName(END).setColor(RED).queue(role -> END_ID = role.getId());
 
         if (getCategoryID(event) == UNDEFINED)
             event.getGuild().createCategory(CATEGORY).complete();
