@@ -11,6 +11,8 @@ import net.dv8tion.jda.api.utils.MemberCachePolicy;
 
 import java.util.Arrays;
 
+
+//DISCORD
 public class Application {
     public static void main(String[] args) {
         JDABuilder.create(Config.getToken(), Arrays.asList(INTENTS))

@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.events.guild.GuildReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 
+//DISCORD
 public class GuildManager extends ListenerAdapter {
     private final long UNDEFINED = 0L;
 

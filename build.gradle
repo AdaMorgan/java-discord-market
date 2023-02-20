@@ -11,6 +11,7 @@ repositories {
 
 dependencies {
     implementation group: 'net.dv8tion', name: 'JDA', version: '5.0.0-beta.3'
+    implementation group: 'com.discord4j', name: 'discord4j-core', version: '3.2.3'
 
     implementation group: 'com.moandjiezana.toml', name: 'toml4j', version: '0.7.2'
 

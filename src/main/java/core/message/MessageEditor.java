@@ -1,6 +1,7 @@
 package core.message;
 
 import core.Timer;
+import core.database.Connect;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -9,8 +10,11 @@ import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Date;
 
+//DISCORD
 public class MessageEditor extends ListenerAdapter {
     private String USERNAME;
     private long AUTHOR_ID, LEADER_ID;
@@ -24,14 +28,22 @@ public class MessageEditor extends ListenerAdapter {
     public void onMessageReceived(MessageReceivedEvent event) {
         if (event.getMessage().getContentRaw().equalsIgnoreCase("test")) {
             this.AUTHOR_ID = event.getAuthor().getIdLong();
-            event.getChannel().sendMessage("<@&1072447833153736784>").setEmbeds(messageEmbed(this.TIME = 5, 0, "NaN")).queue(message -> {
-                this.MESSAGE_ID = message.getIdLong();
-                message.addReaction(Emoji.fromUnicode("\uD83D\uDFE9")).queue();
-                message.addReaction(Emoji.fromUnicode("\uD83D\uDFE8")).queue();
-                message.addReaction(Emoji.fromUnicode("\uD83D\uDFE5")).queue();
-                message.addReaction(Emoji.fromUnicode("\uD83D\uDFE1")).queue();
-            });
+            createMessage(event);
         }
+    }
+
+    private void createMessage(MessageReceivedEvent event) throws SQLException {
+        event.getChannel().sendMessage("<@&1072447833153736784>").setEmbeds(messageEmbed(this.TIME = 5, 0, "NaN")).queue(message -> {
+            this.MESSAGE_ID = message.getIdLong();
+            message.addReaction(Emoji.fromUnicode("\uD83D\uDFE9")).queue();
+            message.addReaction(Emoji.fromUnicode("\uD83D\uDFE8")).queue();
+            message.addReaction(Emoji.fromUnicode("\uD83D\uDFE5")).queue();
+            message.addReaction(Emoji.fromUnicode("\uD83D\uDFE1")).queue();
+        });
+    }
+
+    private ResultSet createTable() {
+        return Connect.getConnect().createStatement().executeQuery("CREATE TABLE " + this.MESSAGE_ID);
     }
 
     @Override
