@@ -29,10 +29,11 @@ public class MessageEditor extends ListenerAdapter {
         if (event.getMessage().getContentRaw().equalsIgnoreCase("test")) {
             this.AUTHOR_ID = event.getAuthor().getIdLong();
             createMessage(event);
+            Adapter.messageReceivedEvent = event;
         }
     }
 
-    private void createMessage(MessageReceivedEvent event) throws SQLException {
+    private void createMessage(MessageReceivedEvent event) {
         event.getChannel().sendMessage("<@&1072447833153736784>").setEmbeds(messageEmbed(this.TIME = 5, 0, "NaN")).queue(message -> {
             this.MESSAGE_ID = message.getIdLong();
             message.addReaction(Emoji.fromUnicode("\uD83D\uDFE9")).queue();
@@ -42,7 +43,7 @@ public class MessageEditor extends ListenerAdapter {
         });
     }
 
-    private ResultSet createTable() {
+    private ResultSet createTable() throws SQLException {
         return Connect.getConnect().createStatement().executeQuery("CREATE TABLE " + this.MESSAGE_ID);
     }
 
