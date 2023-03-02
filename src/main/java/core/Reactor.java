@@ -4,7 +4,7 @@ import reactor.core.publisher.Flux;
 
 import java.time.Duration;
 
-public class Reactor {
+class Reactor {
     public static void main(String[] args) throws InterruptedException {
         Flux.generate(synchronous -> synchronous.next("Ping!"))
                 .delayElements(Duration.ofSeconds(5))

@@ -1,5 +1,7 @@
 package core;
 
+import java.util.Random;
+
 // Unique Message Identifier
 // 16-04742719
 public class UMID {
@@ -16,13 +18,17 @@ public class UMID {
     }
 
     private static long isValid() {
-        return getGenerateID(new StringBuilder());
+        return 1L;
         //return !isValid(generate) ? generate : isValid();
     }
 
-    private static long getGenerateID(StringBuilder builder) {
+    private static long getGenerateID(StringBuilder builder, Random random) {
         for (int i = 0; i < 8; i++)
-            builder.append((int) (Math.random() * 9));
+            builder.append(random.nextInt(9));
         return Long.parseLong(builder.toString());
+    }
+
+    public static void main(String[] args) {
+        System.out.println(getGenerateID(new StringBuilder(), new Random()));
     }
 }

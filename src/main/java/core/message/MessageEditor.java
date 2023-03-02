@@ -5,14 +5,23 @@ import core.database.Connect;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.events.guild.GuildReadyEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 //DISCORD
 public class MessageEditor extends ListenerAdapter {
@@ -25,26 +34,29 @@ public class MessageEditor extends ListenerAdapter {
     private int TIME = 0;
 
     @Override
-    public void onMessageReceived(MessageReceivedEvent event) {
-        if (event.getMessage().getContentRaw().equalsIgnoreCase("test")) {
-            this.AUTHOR_ID = event.getAuthor().getIdLong();
+    public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
+        if (event.getName().equals("test")) {
+            OptionMapping option = event.getOption("message");
+            this.AUTHOR_ID = event.getMember().getIdLong();
             createMessage(event);
-            Adapter.messageReceivedEvent = event;
         }
     }
 
-    private void createMessage(MessageReceivedEvent event) {
-        event.getChannel().sendMessage("<@&1072447833153736784>").setEmbeds(messageEmbed(this.TIME = 5, 0, "NaN")).queue(message -> {
-            this.MESSAGE_ID = message.getIdLong();
-            message.addReaction(Emoji.fromUnicode("\uD83D\uDFE9")).queue();
-            message.addReaction(Emoji.fromUnicode("\uD83D\uDFE8")).queue();
-            message.addReaction(Emoji.fromUnicode("\uD83D\uDFE5")).queue();
-            message.addReaction(Emoji.fromUnicode("\uD83D\uDFE1")).queue();
-        });
+    @Override
+    public void onGuildReady(@NotNull GuildReadyEvent event) {
+        List<CommandData> list = new ArrayList<>();
+
+        list.add(Commands.slash("test", "Test command").addOptions(getOptionList()));
+
+        event.getGuild().updateCommands().addCommands(list).queue();
     }
 
-    private ResultSet createTable() throws SQLException {
-        return Connect.getConnect().createStatement().executeQuery("CREATE TABLE " + this.MESSAGE_ID);
+    private ArrayList<OptionData> getOptionList() {
+        ArrayList<OptionData> list = new ArrayList<>();
+
+        list.add(new OptionData(OptionType.STRING, "message", "Test message", true));
+
+        return list;
     }
 
     @Override
@@ -62,6 +74,20 @@ public class MessageEditor extends ListenerAdapter {
                 getEmojiReaction(event);
             }
         }
+    }
+
+    private void createMessage(SlashCommandInteractionEvent event) {
+        event.getChannel().sendMessage("<@&1072447833153736784>").setEmbeds(messageEmbed(this.TIME = 5, 0, "NaN")).queue(message -> {
+            this.MESSAGE_ID = message.getIdLong();
+            message.addReaction(Emoji.fromUnicode("\uD83D\uDFE9")).queue();
+            message.addReaction(Emoji.fromUnicode("\uD83D\uDFE8")).queue();
+            message.addReaction(Emoji.fromUnicode("\uD83D\uDFE5")).queue();
+            message.addReaction(Emoji.fromUnicode("\uD83D\uDFE1")).queue();
+        });
+    }
+
+    private ResultSet createTable() throws SQLException {
+        return Connect.getConnect().createStatement().executeQuery("CREATE TABLE " + this.MESSAGE_ID);
     }
 
     private void getEmojiReaction(MessageReactionAddEvent event) {

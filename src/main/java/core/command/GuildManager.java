@@ -7,26 +7,28 @@ import net.dv8tion.jda.api.events.guild.GuildReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 
-//DISCORD
+import java.awt.*;
+
 public class GuildManager extends ListenerAdapter {
     private final long UNDEFINED = 0L;
 
     private final String CATEGORY = "TRADE";
     private final String CHANNEL = "cap-auctions";
 
-    //ROLE
-    private final String NEW = "New Auction";
-    private final String END = "Ending Soon";
+    @SuppressWarnings("FieldCanBeLocal")
+    private final String NEW = "New Auction", END = "Ending Soon";
+    private final Color RED = Color.decode("#ec084e"), BLUE = Color.decode("#1ce7dd");
 
     public String NEW_ID, END_ID;
 
     @Override
+    @SuppressWarnings("ConstantConditions")
     public void onGuildReady(@NotNull GuildReadyEvent event) {
-//        if (getRoleID(event, NEW) == UNDEFINED)
-//            event.getGuild().createRole().setName(NEW).setColor(BLUE).queue(role -> NEW_ID = role.getId());
-//
-//        if (getRoleID(event, END) == UNDEFINED)
-//            event.getGuild().createRole().setName(END).setColor(RED).queue(role -> END_ID = role.getId());
+        if (getRoleID(event, NEW) == UNDEFINED)
+            event.getGuild().createRole().setName(NEW).setColor(BLUE).queue(role -> NEW_ID = role.getId());
+
+        if (getRoleID(event, END) == UNDEFINED)
+            event.getGuild().createRole().setName(END).setColor(RED).queue(role -> END_ID = role.getId());
 
         if (getCategoryID(event) == UNDEFINED)
             event.getGuild().createCategory(CATEGORY).complete();
