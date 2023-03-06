@@ -1,7 +1,6 @@
 package core.message;
 
 import core.Timer;
-import core.database.Connect;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -10,20 +9,17 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.jetbrains.annotations.NotNull;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Arrays;
 import java.util.List;
 
-//DISCORD
 public class MessageEditor extends ListenerAdapter {
     private String USERNAME;
     private long AUTHOR_ID, LEADER_ID;
@@ -36,7 +32,6 @@ public class MessageEditor extends ListenerAdapter {
     @Override
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
         if (event.getName().equals("test")) {
-            OptionMapping option = event.getOption("message");
             this.AUTHOR_ID = event.getMember().getIdLong();
             createMessage(event);
         }
@@ -45,20 +40,16 @@ public class MessageEditor extends ListenerAdapter {
     @Override
     public void onGuildReady(@NotNull GuildReadyEvent event) {
         List<CommandData> list = new ArrayList<>();
-
         list.add(Commands.slash("test", "Test command").addOptions(getOptionList()));
-
         event.getGuild().updateCommands().addCommands(list).queue();
     }
 
-    private ArrayList<OptionData> getOptionList() {
-        ArrayList<OptionData> list = new ArrayList<>();
-
-        list.add(new OptionData(OptionType.STRING, "message", "Test message", true));
-
-        return list;
+    // TODO: replace
+    private List<OptionData> getOptionList() {
+        return List.of(new OptionData(OptionType.STRING, "message", "Test message", true));
     }
 
+    // TODO: replace
     @Override
     public void onMessageReactionAdd(@NotNull MessageReactionAddEvent event) {
         if (!event.getUser().isBot()) {
@@ -86,10 +77,6 @@ public class MessageEditor extends ListenerAdapter {
         });
     }
 
-    private ResultSet createTable() throws SQLException {
-        return Connect.getConnect().createStatement().executeQuery("CREATE TABLE " + this.MESSAGE_ID);
-    }
-
     private void getEmojiReaction(MessageReactionAddEvent event) {
         if (event.getUser() != null) {
             switch (event.getEmoji().getAsReactionCode()) {
@@ -114,12 +101,12 @@ public class MessageEditor extends ListenerAdapter {
     }
 
     private MessageEmbed messageEmbed(int timer, int count, String username) {
-        EmbedBuilder embedBuilder = new EmbedBuilder();
-        embedBuilder.setAuthor(Timer.getTimer(timer));
-        embedBuilder.addField("Starting @", this.STARTING.toString(), true);
-        embedBuilder.addField("Current Bid:", String.valueOf(count), true);
-        embedBuilder.setFooter(username);
-        embedBuilder.setTimestamp(new Date().toInstant());
-        return embedBuilder.build();
+        return new EmbedBuilder()
+                .setAuthor(Timer.getTimer(timer))
+                .addField("Starting @", this.STARTING.toString(), true)
+                .addField("Current Bid:", String.valueOf(count), true)
+                .setFooter(username)
+                .setTimestamp(Instant.now())
+                .build();
     }
 }

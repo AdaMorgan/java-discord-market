@@ -4,32 +4,32 @@ import com.moandjiezana.toml.Toml;
 
 import java.io.File;
 
-public class Config {
+public interface Config {
     private static Toml getFile() {
         return new Toml().read(new File("config.toml"));
     }
 
-    public static String getToken() {
+    static String getToken() {
         return getFile().getString("discord.token");
     }
 
-    public String getDriver() {
+    static String getDriver() {
         return getFile().getString("database.postgres.driver");
     }
 
-    public String getName() {
+    static String getName() {
         return getFile().getString("database.postgres.name");
     }
 
-    public String getHost() {
+    static String getHost() {
         return getFile().getString("database.postgres.host");
     }
 
-    public String getUser() {
+    static String getUser() {
         return getFile().getString("database.postgres.user");
     }
 
-    public String getPassword() {
+    static String getPassword() {
         return getFile().getString("database.postgres.password");
     }
 }

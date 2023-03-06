@@ -5,7 +5,7 @@ package core;
 * ItemName | ID | Stack (true or false)
 *
 */
-public class ItemListener {
+public interface ItemListener {
 
     private long getItemID() {
         return 1L;

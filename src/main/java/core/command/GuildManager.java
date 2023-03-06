@@ -13,7 +13,8 @@ public class GuildManager extends ListenerAdapter {
     private final long UNDEFINED = 0L;
 
     private final String CATEGORY = "TRADE";
-    private final String CHANNEL = "cap-auctions";
+    private final String AUCTIONS = "auctions";
+    private final String ARCHIVE = "archive";
 
     @SuppressWarnings("FieldCanBeLocal")
     private final String NEW = "New Auction", END = "Ending Soon";
@@ -30,34 +31,42 @@ public class GuildManager extends ListenerAdapter {
         if (getRoleID(event, END) == UNDEFINED)
             event.getGuild().createRole().setName(END).setColor(RED).queue(role -> END_ID = role.getId());
 
-        if (getCategoryID(event) == UNDEFINED)
+        if (getCategoryID(event, CATEGORY) == UNDEFINED)
             event.getGuild().createCategory(CATEGORY).complete();
 
-        if (getChannelID(event) == UNDEFINED)
-            event.getGuild().getCategoryById(getCategoryID(event)).createTextChannel(CHANNEL).complete();
+        if (getChannelID(event, AUCTIONS) == UNDEFINED)
+            event.getGuild().getCategoryById(getCategoryID(event, CATEGORY)).createTextChannel(AUCTIONS)
+                    .queue();
+
+        if (getArchiveID(event, ARCHIVE) == UNDEFINED)
+            event.getGuild().getCategoryById(getCategoryID(event, CATEGORY)).createTextChannel(ARCHIVE).queue();
     }
 
-    private long getCategoryID(GuildReadyEvent event) {
-        for (Category category : event.getGuild().getCategories())
-            if (category.getName().equals(CATEGORY))
-                return category.getIdLong();
-
-        return UNDEFINED;
+    public long getArchiveID(GuildReadyEvent event, String name) {
+        return event.getGuild().getCategories().stream()
+                .filter(channel -> channel.getName().equals(name))
+                .findFirst()
+                .map(Channel::getIdLong).orElse(UNDEFINED);
     }
 
-    private long getChannelID(GuildReadyEvent event) {
-        for (Channel channel : event.getGuild().getChannels())
-            if (!channel.getName().equals(CHANNEL))
-                return channel.getIdLong();
+    public long getCategoryID(GuildReadyEvent event, String name) {
+        return event.getGuild().getCategories().stream()
+                .filter(category -> category.getName().equals(name))
+                .findFirst()
+                .map(Category::getIdLong).orElse(UNDEFINED);
+    }
 
-        return UNDEFINED;
+    public long getChannelID(GuildReadyEvent event, String name) {
+        return event.getGuild().getChannels().stream()
+                .filter(channel -> channel.getName().equals(name))
+                .findFirst()
+                .map(Channel::getIdLong).orElse(UNDEFINED);
     }
 
     public long getRoleID(GuildReadyEvent event, String name) {
-        for (Role role : event.getGuild().getRoles())
-            if (role.getName().equals(name))
-                return role.getIdLong();
-
-        return UNDEFINED;
+        return event.getGuild().getRoles().stream()
+                .filter(role -> role.getName().equals(name))
+                .findFirst()
+                .map(Role::getIdLong).orElse(UNDEFINED);
     }
 }

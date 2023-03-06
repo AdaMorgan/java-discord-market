@@ -27,8 +27,4 @@ public class UMID {
             builder.append(random.nextInt(9));
         return Long.parseLong(builder.toString());
     }
-
-    public static void main(String[] args) {
-        System.out.println(getGenerateID(new StringBuilder(), new Random()));
-    }
 }

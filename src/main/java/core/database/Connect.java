@@ -8,14 +8,10 @@ import java.sql.SQLException;
 
 public class Connect {
     public static Connection getConnect() throws SQLException {
-        return DriverManager.getConnection(getPattern(), getConfig().getUser(), getConfig().getPassword());
+        return DriverManager.getConnection(getPattern(), Config.getUser(), Config.getPassword());
     }
 
     private static String getPattern() {
-        return String.format("%s://%s/%s", getConfig().getDriver(), getConfig().getHost(), getConfig().getName());
-    }
-
-    private static Config getConfig() {
-        return new Config();
+        return String.format("%s://%s/%s", Config.getDriver(), Config.getHost(), Config.getName());
     }
 }
