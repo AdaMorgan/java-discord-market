@@ -12,16 +12,16 @@ public class Timer {
         return count < 1 ? "Expires:" : "ENDING SOON!";
     }
 
-    private Date getDateStart() {
+    public Date getDateStart() {
         return new Date();
     }
 
-    public static String getTimer(int count) {
-        return String.format("%s %s %s", TIMER.getText(count), TIMER.getPattern(count), TIMER.getTimeToHours(count));
+    public Date getDateStop(int count) {
+        return Date.from(getDateStart().toInstant().plus(count, ChronoUnit.HOURS));
     }
 
-    private Date getDateStop(int count) {
-        return Date.from(getDateStart().toInstant().plus(count, ChronoUnit.HOURS));
+    public static String getTimerText(int count) {
+        return String.format("%s %s %s", TIMER.getText(count), TIMER.getPattern(count), TIMER.getTimeToHours(count));
     }
 
     private String getPattern(int count) {

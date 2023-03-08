@@ -1,6 +1,7 @@
 package core.message;
 
 import core.Timer;
+import core.database.Query;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -15,9 +16,10 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
+import java.sql.SQLException;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class MessageEditor extends ListenerAdapter {
@@ -60,9 +62,9 @@ public class MessageEditor extends ListenerAdapter {
             if (event.getUserIdLong() == this.LEADER_ID)
                 event.getUser().openPrivateChannel().complete().sendMessage("LEADER!").queue();
 
-            if (event.getUserIdLong() != this.AUTHOR_ID && event.getUserIdLong() != this.LEADER_ID) {
+            if (event.getUserIdLong() != this.LEADER_ID) {
                 this.LEADER_ID = event.getUserIdLong();
-                getEmojiReaction(event);
+                //getEmojiReaction(event);
             }
         }
     }
@@ -77,19 +79,15 @@ public class MessageEditor extends ListenerAdapter {
         });
     }
 
-    private void getEmojiReaction(MessageReactionAddEvent event) {
+    private void getEmojiReaction(MessageReactionAddEvent event) throws SQLException, IOException {
         if (event.getUser() != null) {
             switch (event.getEmoji().getAsReactionCode()) {
                 case "\uD83D\uDFE9" -> editMessageEmbeds(event, this.CURRENT += 1, event.getUser().getName());
                 case "\uD83D\uDFE8" -> editMessageEmbeds(event, this.CURRENT += 10, event.getUser().getName());
                 case "\uD83D\uDFE5" -> editMessageEmbeds(event, this.CURRENT += 100, event.getUser().getName());
-                case "\uD83D\uDFE1" -> onAuctionLeave();
+                case "\uD83D\uDFE1" -> Query.createTable(event, "src/main/resources/scripts/table.sql");
             }
         }
-    }
-
-    private void onAuctionLeave() {
-        System.out.println("Work!!!");
     }
 
     private void editMessageEmbeds(MessageReactionAddEvent event, int count, String name) {
@@ -102,7 +100,7 @@ public class MessageEditor extends ListenerAdapter {
 
     private MessageEmbed messageEmbed(int timer, int count, String username) {
         return new EmbedBuilder()
-                .setAuthor(Timer.getTimer(timer))
+                .setAuthor(Timer.getTimerText(timer))
                 .addField("Starting @", this.STARTING.toString(), true)
                 .addField("Current Bid:", String.valueOf(count), true)
                 .setFooter(username)

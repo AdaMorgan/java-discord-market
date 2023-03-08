@@ -3,33 +3,36 @@ package core.config;
 import com.moandjiezana.toml.Toml;
 
 import java.io.File;
+import java.util.function.Function;
 
 public interface Config {
+    Function<String, String> getKey = key -> getFile().getString(key);
+
     private static Toml getFile() {
         return new Toml().read(new File("config.toml"));
     }
 
     static String getToken() {
-        return getFile().getString("discord.token");
+        return getKey.apply("discord.token");
     }
 
     static String getDriver() {
-        return getFile().getString("database.postgres.driver");
+        return getKey.apply("database.postgres.driver");
     }
 
     static String getName() {
-        return getFile().getString("database.postgres.name");
+        return getKey.apply("database.postgres.name");
     }
 
     static String getHost() {
-        return getFile().getString("database.postgres.host");
+        return getKey.apply("database.postgres.host");
     }
 
     static String getUser() {
-        return getFile().getString("database.postgres.user");
+        return getKey.apply("database.postgres.user");
     }
 
     static String getPassword() {
-        return getFile().getString("database.postgres.password");
+        return getKey.apply("database.postgres.password");
     }
 }

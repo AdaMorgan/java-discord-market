@@ -42,18 +42,18 @@ public class GuildManager extends ListenerAdapter {
             event.getGuild().getCategoryById(getCategoryID(event, CATEGORY)).createTextChannel(ARCHIVE).queue();
     }
 
-    public long getArchiveID(GuildReadyEvent event, String name) {
-        return event.getGuild().getCategories().stream()
-                .filter(channel -> channel.getName().equals(name))
-                .findFirst()
-                .map(Channel::getIdLong).orElse(UNDEFINED);
-    }
-
     public long getCategoryID(GuildReadyEvent event, String name) {
         return event.getGuild().getCategories().stream()
                 .filter(category -> category.getName().equals(name))
                 .findFirst()
                 .map(Category::getIdLong).orElse(UNDEFINED);
+    }
+
+    public long getArchiveID(GuildReadyEvent event, String name) {
+        return event.getGuild().getChannels().stream()
+                .filter(channel -> channel.getName().equals(name))
+                .findFirst()
+                .map(Channel::getIdLong).orElse(UNDEFINED);
     }
 
     public long getChannelID(GuildReadyEvent event, String name) {
