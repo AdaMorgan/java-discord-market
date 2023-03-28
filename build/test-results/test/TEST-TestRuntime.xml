@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="TestRuntime" tests="1" skipped="0" failures="0" errors="0" timestamp="2023-02-19T14:17:35" hostname="JOHNREGAN" time="0.232">
-  <properties/>
-  <testcase name="isConnect()" classname="TestRuntime" time="0.232"/>
-  <system-out><![CDATA[]]></system-out>
-  <system-err><![CDATA[]]></system-err>
-</testsuite>
