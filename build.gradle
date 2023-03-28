@@ -29,3 +29,8 @@ dependencies {
 test {
     useJUnitPlatform()
 }
+
+wrapper {
+    gradleVersion '8.0'
+    distributionUrl distributionUrl.replace("bin", "all")
+}

@@ -32,11 +32,10 @@ public class GuildManager extends ListenerAdapter {
             event.getGuild().createRole().setName(END).setColor(RED).queue(role -> END_ID = role.getId());
 
         if (getCategoryID(event, CATEGORY) == UNDEFINED)
-            event.getGuild().createCategory(CATEGORY).complete();
+            event.getGuild().createCategory(CATEGORY).queue();
 
         if (getChannelID(event, AUCTIONS) == UNDEFINED)
-            event.getGuild().getCategoryById(getCategoryID(event, CATEGORY)).createTextChannel(AUCTIONS)
-                    .queue();
+            event.getGuild().getCategoryById(getCategoryID(event, CATEGORY)).createTextChannel(AUCTIONS).queue();
 
         if (getArchiveID(event, ARCHIVE) == UNDEFINED)
             event.getGuild().getCategoryById(getCategoryID(event, CATEGORY)).createTextChannel(ARCHIVE).queue();

@@ -6,11 +6,7 @@ import java.io.File;
 import java.util.function.Function;
 
 public interface Config {
-    Function<String, String> getKey = key -> getFile().getString(key);
-
-    private static Toml getFile() {
-        return new Toml().read(new File("config.toml"));
-    }
+    Function<String, String> getKey = key -> new Toml().read(new File("config.toml")).getString(key);
 
     static String getToken() {
         return getKey.apply("discord.token");
