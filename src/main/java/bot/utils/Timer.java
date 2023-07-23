@@ -1,4 +1,4 @@
-package core;
+package bot.utils;
 
 import java.text.SimpleDateFormat;
 import java.time.temporal.ChronoUnit;
