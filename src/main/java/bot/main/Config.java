@@ -12,11 +12,11 @@ public class Config {
     }
 
     public String getToken() {
-        return content.getString("discord.token");
+        return content.getString("bot.token");
     }
 
     public static Config readFromFile(String path) {
-        try(FileReader reader = new FileReader(path)) {
+        try (FileReader reader = new FileReader(path)) {
             return new Config(new Toml().read(reader));
         } catch(Exception exception) {
             throw new RuntimeException("Failed to read config", exception);

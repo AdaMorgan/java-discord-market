@@ -11,6 +11,7 @@ public class Auction {
     public final long id;
     public final String item;
     public final int start;
+    public Message message;
     public int current;
 
     public final User user;
@@ -20,17 +21,30 @@ public class Auction {
     public final Date date;
 
     public Auction(Message message, String item, int start, Date date, User user) {
+        this.message = message;
         this.id = message.getIdLong();
         this.item = item;
         this.start = start;
-        this.current = 0;
         this.leader = null;
+        this.current = 0;
         this.date = date;
         this.user = user;
     }
 
-    public void create() {
+    public void update() {
+        this.message.editMessageEmbeds(this.message.getEmbeds()).queue();
+    }
 
+    public void bid(User user, int value) {
+        this.users.put(user, value);
+        this.current += value;
+        this.leader = user;
+        this.update();
+    }
+
+    public void leave(User user) {
+        this.users.remove(user);
+        this.update();
     }
 
     private Map.Entry<User, Integer> last() {
