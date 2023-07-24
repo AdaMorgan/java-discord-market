@@ -5,8 +5,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
-public class Timer {
-    private static final Timer TIMER = new Timer();
+public class TimerUtil {
+    private static final TimerUtil TIMER = new TimerUtil();
 
     private String getText(int count) {
         return count < 1 ? "Expires:" : "ENDING SOON!";

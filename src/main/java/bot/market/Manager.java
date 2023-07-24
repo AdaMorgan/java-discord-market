@@ -2,7 +2,6 @@ package bot.market;
 
 import bot.main.Application;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 

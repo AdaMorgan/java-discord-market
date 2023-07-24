@@ -3,10 +3,9 @@ package bot.listener;
 import bot.main.Application;
 import bot.market.Auction;
 import bot.market.Controller;
-import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -48,31 +47,28 @@ public class ControlListener extends ListenerAdapter {
         if (event.getAuthor().isBot()) return;
 
         if (event.getMessage().getContentRaw().equals("!auction")) {
-            add(getController(event.getGuild()), new Auction(event.getMessage(), "item", 100, new Date(), event.getAuthor()), event.getMessage(), event.getChannel());
+            add(getController(event.getGuild()), event.getChannel(), event.getAuthor());
         }
     }
 
-    private void add(Controller controller, Auction auction, Message message, MessageChannel channel) {
-        controller.lots.put(message.getIdLong(), auction);
-        channel.sendMessageEmbeds(message(auction))
-                .setComponents(buttons())
-                .queue();
-    }
+    private void add(Controller controller, MessageChannel channel, User user) {
+        Auction item = new Auction("item", 100, new Date(), user);
 
-    private synchronized MessageEmbed message(Auction auction) {
-        return new EmbedBuilder()
-                .addField("**Starting** @\n", String.valueOf(auction.start), true)
-                .addField("**Current Bid:**\n", String.valueOf(auction.current), true)
-                .build();
+        channel.sendMessageEmbeds(item.message())
+                .setComponents(buttons())
+                .queue(message -> {
+                    item.setId(message);
+                    controller.lots.put(message.getIdLong(), item);
+                });
     }
 
     private List<ActionRow> buttons() {
         return List.of(
                 ActionRow.of(
-                        Button.primary("1", "+1"),
-                        Button.primary("10", "+10"),
-                        Button.primary("100", "+100"),
-                        Button.primary("leave", "leave")
+                        Button.primary("lot:1", "+1"),
+                        Button.primary("lot:10", "+10"),
+                        Button.primary("lot:100", "+100"),
+                        Button.primary("lot:leave", "leave")
                 )
         );
     }
