@@ -1,4 +1,4 @@
-package bot.market.type;
+package bot.utils.type;
 
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 

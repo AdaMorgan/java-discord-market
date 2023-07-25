@@ -1,13 +1,9 @@
-package bot.utils;
+package bot.utils.utils;
 
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 
-import java.util.List;
-
-public class InputData {
+public class InputUtil {
     public static TextInput create(String id, String label, String placeholder) {
         return TextInput.create(id, label, TextInputStyle.SHORT)
                 .setMinLength(0)

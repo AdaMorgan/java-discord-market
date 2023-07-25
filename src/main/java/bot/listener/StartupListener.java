@@ -1,10 +1,9 @@
 package bot.listener;
 
 import bot.main.Application;
-import bot.market.Controller;
-import bot.market.type.StatusType;
+import bot.utils.Controller;
+import bot.utils.type.StatusType;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.session.ReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
