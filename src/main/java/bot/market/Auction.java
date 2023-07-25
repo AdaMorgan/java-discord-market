@@ -1,9 +1,11 @@
 package bot.market;
 
+import bot.utils.MessageUtil;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
 
 import java.util.Comparator;
 import java.util.Date;
@@ -22,27 +24,31 @@ public class Auction {
 
     public final Date date;
 
-    public Auction(String item, int start, Date date, User user) {
+    public Auction(Message message, String item, int start, Date date, User author) {
+        this.message = message;
         this.item = item;
         this.start = start;
-        this.leader = getLeader();
+        this.leader = null;
         this.current = 0;
         this.date = date;
-        this.user = user;
-    }
-
-    public void setId(Message message) {
-        this.message = message;
+        this.user = author;
     }
 
     public void update() {
         this.current = getLeader() != null ? this.users.get(getLeader()) : 0;
+        this.leader = getLeader();
         this.message.editMessageEmbeds(message()).queue();
     }
 
-    public void bid(User user, int value) {
-        this.users.put(user, getMaxValue() + value + getStartValue());
+    public void bid(IReplyCallback event, int value) {
+        intercepted(event.getUser());
+        this.users.put(event.getUser(), getMaxValue() + value + getStartValue());
         this.update();
+    }
+
+    private void intercepted(User user) {
+        if (!users.isEmpty() && this.leader != null && !this.leader.equals(user))
+            this.leader.openPrivateChannel().queue(player -> player.sendMessageEmbeds(MessageUtil.intercepted(1000).build()).queue());
     }
 
     private int getStartValue() {
@@ -75,6 +81,7 @@ public class Auction {
                 .setTitle(getTitle())
                 .addField("**Starting** @\n", String.valueOf(this.start), true)
                 .addField("**Current Bid:**\n", String.valueOf(this.current), true)
+                .setFooter("ID:" + this.message.getIdLong())
                 .build();
     }
 }
