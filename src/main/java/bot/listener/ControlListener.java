@@ -22,12 +22,10 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 public class ControlListener extends ListenerAdapter {
-    private final Application app;
     private final Map<Long, Controller> controllers;
 
     public ControlListener(Application app) {
-        this.app = app;
-        this.controllers = this.app.controller.controllers;
+        this.controllers = app.controller.controllers;
     }
 
     @Override

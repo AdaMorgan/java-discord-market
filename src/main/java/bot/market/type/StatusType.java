@@ -6,18 +6,23 @@ import java.awt.*;
 
 public enum StatusType {
 
-    BEGIN("Expires: ", new Color(88, 101, 242), EmojiType.BEGIN.fromUnicode()),
-    ENDING("ENDING SOON! ", new Color(237, 66, 69), EmojiType.ENDING.fromUnicode());
+    BEGIN("New auction", "Expires: ", new Color(88, 101, 242), EmojiType.BEGIN.fromUnicode()),
+    ENDING("Ending soon", "ENDING SOON! ", new Color(237, 66, 69), EmojiType.ENDING.fromUnicode());;
 
-
+    private final String role;
     private final String text;
     private final Emoji emoji;
     private final Color color;
 
-    StatusType(String text, Color color, Emoji emoji) {
+    StatusType(String role, String text, Color color, Emoji emoji) {
+        this.role = role;
         this.text = text;
         this.color = color;
         this.emoji = emoji;
+    }
+
+    public String getRole() {
+        return role;
     }
 
     public String getText() {
