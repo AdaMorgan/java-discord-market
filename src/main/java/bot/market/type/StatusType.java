@@ -6,15 +6,22 @@ import java.awt.*;
 
 public enum StatusType {
 
-    BEGIN("#5865F2", EmojiType.BEGIN.fromUnicode()),
-    ENDING("#ED4245", EmojiType.ENDING.fromUnicode());
+    BEGIN("Expires: ", new Color(88, 101, 242), EmojiType.BEGIN.fromUnicode()),
+    ENDING("ENDING SOON! ", new Color(237, 66, 69), EmojiType.ENDING.fromUnicode());
 
+
+    private final String text;
     private final Emoji emoji;
     private final Color color;
 
-    StatusType(String color, Emoji emoji) {
-        this.color = Color.getColor(color);
+    StatusType(String text, Color color, Emoji emoji) {
+        this.text = text;
+        this.color = color;
         this.emoji = emoji;
+    }
+
+    public String getText() {
+        return this.text;
     }
 
     public Color getColor() {

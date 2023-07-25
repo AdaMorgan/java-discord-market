@@ -2,7 +2,7 @@ package bot.main;
 
 import bot.listener.ControlListener;
 import bot.listener.StartupListener;
-import bot.market.Manager;
+import bot.market.Controller;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
 public class Application {
     public final JDA jda;
     public final Config config;
-    public final Manager manager = new Manager(this);
+    public final Controller controller = new Controller(this);
 
     public static void main(String[] args) {
         new Application(Config.readFromFile("config.toml"));

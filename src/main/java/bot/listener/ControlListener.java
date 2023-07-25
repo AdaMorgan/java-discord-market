@@ -17,15 +17,17 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 public class ControlListener extends ListenerAdapter {
     private final Application app;
+    private final Map<Long, Controller> controllers;
 
     public ControlListener(Application app) {
         this.app = app;
+        this.controllers = this.app.controller.controllers;
     }
 
     @Override
@@ -34,11 +36,13 @@ public class ControlListener extends ListenerAdapter {
 
         if (!id[0].equals("bid")) return;
 
-        switch (id[1]) {
-            case "1" -> requireController(event, event.getMessage(), auction -> auction.bid(event, 1));
-            case "10" -> requireController(event, event.getMessage(), auction -> auction.bid(event, 10));
-            case "100" -> requireController(event, event.getMessage(), auction -> auction.bid(event, 100));
-            case "leave" -> requireController(event, event.getMessage(), auction -> auction.leave(event.getUser()));
+        if (getController(event.getGuild()).lots.containsKey(event.getMessage().getIdLong())) {
+            switch (id[1]) {
+                case "1" -> requireController(event, event.getMessage(), auction -> auction.bid(event, 1));
+                case "10" -> requireController(event, event.getMessage(), auction -> auction.bid(event, 10));
+                case "100" -> requireController(event, event.getMessage(), auction -> auction.bid(event, 100));
+                case "leave" -> requireController(event, event.getMessage(), auction -> auction.leave(event.getUser()));
+            }
         }
 
         if (!event.isAcknowledged()) event.deferEdit().queue();
@@ -54,17 +58,14 @@ public class ControlListener extends ListenerAdapter {
     }
 
     private void add(Controller controller, @NotNull MessageChannel channel, User user) {
-        channel.sendMessageEmbeds(messageLoading())
+        channel.sendMessage("")
                 .setComponents(buttons())
-                .queue(message -> {
-                    Auction item = new Auction(message, "item", 100, new Date(), user);
-                    message.editMessageEmbeds(item.message()).queue();
-                    controller.lots.put(message.getIdLong(), item);
-                });
+                .queue(message -> createAuction(controller, message, new Auction(controller, message, "item", 100, 5, user)));
     }
 
-    private MessageEmbed messageLoading() {
-        return new EmbedBuilder().setTitle("Loading...").build();
+    private void createAuction(Controller controller, Message message, Auction item) {
+        message.editMessageEmbeds(item.message()).queue();
+        controller.lots.put(message.getIdLong(), item);
     }
 
     private List<ActionRow> buttons() {
@@ -79,7 +80,7 @@ public class ControlListener extends ListenerAdapter {
     }
 
     private Controller getController(@NotNull Guild guild) {
-        return this.app.manager.controllers.get(guild.getIdLong());
+        return this.controllers.get(guild.getIdLong());
     }
 
     @NotNull

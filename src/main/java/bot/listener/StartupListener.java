@@ -20,6 +20,6 @@ public class StartupListener extends ListenerAdapter {
     }
 
     private void addController(@NotNull Guild guild) {
-        this.app.manager.controllers.put(guild.getIdLong(), new Controller());
+        this.app.controller.controllers.put(guild.getIdLong(), new Controller(this.app));
     }
 }
