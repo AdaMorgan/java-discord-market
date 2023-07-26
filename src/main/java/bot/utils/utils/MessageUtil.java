@@ -24,7 +24,7 @@ public class MessageUtil {
                         Button.primary("bid:1", "+1"),
                         Button.primary("bid:10", "+10"),
                         Button.primary("bid:100", "+100"),
-                        Button.primary("bid:leave", "leave")
+                        Button.secondary("bid:leave", "leave")
                 )
         );
     }

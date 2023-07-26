@@ -3,6 +3,7 @@ package bot.listener;
 import bot.utils.entity.AuctionEntity;
 import bot.utils.Controller;
 import bot.main.Application;
+import bot.utils.type.ChannelType;
 import bot.utils.utils.MessageUtil;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
@@ -31,41 +32,42 @@ public class ControlListener extends ListenerAdapter {
 
         if (!id[0].equals("bid")) return;
 
-        requireController(event, event.getMessage(), Objects.requireNonNull(auction -> {
+        requireController(event, event.getMessage(), auction -> {
             if (auction != null) {
                 switch (id[1]) {
                     case "1" -> auction.bid(event, 1);
                     case "10" -> auction.bid(event, 10);
                     case "100" -> auction.bid(event, 100);
                     case "leave" -> auction.leave(event.getUser());
+
+                    case "auction" -> add(getController(event.getGuild()), event.getGuild(), event.getMember().getUser(), ChannelType.AUCTION);
                 }
             }
-        }));
+        });
 
         if (!event.isAcknowledged()) event.deferEdit().queue();
     }
 
-    @Override
-    public void onMessageReceived(@NotNull MessageReceivedEvent event) {
-        if (event.getAuthor().isBot()) return;
-
-        if (event.getMessage().getContentRaw().equals("!auction")) {
-            add(getController(event.getGuild()), event.getChannel(), event.getAuthor());
-        }
+    private MessageChannel getChannel(Controller controller, Guild guild, @NotNull ChannelType type) {
+        return switch (type) {
+            case AUCTION -> guild.getTextChannelById(controller.auction.get(guild.getIdLong()));
+            case MARKET -> null;
+            case TRADE -> null;
+        };
     }
 
-    private void add(Controller controller, @NotNull MessageChannel channel, User user) {
-        channel.sendMessage("")
+    private void add(Controller controller, Guild guild, User user, ChannelType type) {
+        getChannel(controller, guild, type).sendMessage("")
                 .setComponents(MessageUtil.getButtons())
                 .queue(message -> {
-                    controller.channels.put(message.getIdLong(), channel);
+                    controller.channels.put(message.getIdLong(), getChannel(controller, guild, type));
                     createAuction(controller, message, new AuctionEntity(controller, message, "item", 100, 10, user));
                 });
     }
 
     private void createAuction(@NotNull Controller controller, @NotNull Message message, @NotNull AuctionEntity item) {
         message.editMessageEmbeds(item.message()).queue();
-        controller.lots.put(message.getIdLong(), item);
+        controller.entity.put(message.getIdLong(), item);
     }
 
     private Controller getController(@NotNull Guild guild) {
@@ -74,7 +76,7 @@ public class ControlListener extends ListenerAdapter {
 
     @NotNull
     private AuctionEntity getAuction(@NotNull Guild guild, @NotNull Message message) {
-        return getController(guild).lots.get(message.getIdLong());
+        return getController(guild).entity.get(message.getIdLong());
     }
 
     private void requireController(@NotNull IReplyCallback event, Message message, @NotNull Consumer<AuctionEntity> handler) {

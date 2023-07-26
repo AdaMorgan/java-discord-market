@@ -11,7 +11,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class Controller {
     public final Map<Long, MessageChannel> channels = new ConcurrentHashMap<>();
     public final Map<Long, Controller> controllers = new ConcurrentHashMap<>();
-    public Map<Long, AuctionEntity> lots = new HashMap<>();
+    public Map<Long, AuctionEntity> entity = new HashMap<>();
+    public Map<Long, Long> auction = new HashMap<>();
 
     public final Application app;
 

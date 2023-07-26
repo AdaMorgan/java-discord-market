@@ -22,12 +22,11 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-public class AuctionEntity {
+public class AuctionEntity extends Entity {
     private final Controller controller;
 
     public final String item;
     public final int start, time;
-    private final TimerTask timer;
     private StatusType status;
     public Message message;
     public int current, bid;
@@ -49,9 +48,8 @@ public class AuctionEntity {
         this.time = time;
         this.author = author;
         this.bid = 0;
-        this.timer = new TimerTask(this, time);
 
-        scheduler.scheduleAtFixedRate(this.timer, 0, 1, TimeUnit.SECONDS);
+        scheduler.scheduleAtFixedRate(new TimerTask(this, time), 0, 1, TimeUnit.SECONDS);
     }
 
     private MessageChannel getChannel() {
@@ -64,10 +62,10 @@ public class AuctionEntity {
         getChannel().sendMessage("")
                 .setComponents(MessageUtil.getButtons())
                 .queue(newMessage -> {
-                    controller.lots.remove(this.message.getIdLong());
+                    controller.entity.remove(this.message.getIdLong());
                     this.message = newMessage;
                     this.update();
-                    controller.lots.put(newMessage.getIdLong(), this);
+                    controller.entity.put(newMessage.getIdLong(), this);
                 });
     }
 
@@ -83,7 +81,7 @@ public class AuctionEntity {
 
     public void stop() {
         removeMessage();
-        this.controller.lots.remove(this.message.getIdLong());
+        this.controller.entity.remove(this.message.getIdLong());
         this.author.openPrivateChannel().queue(channel -> channel.sendMessageEmbeds(state().build()).queue());
         this.scheduler.shutdown();
     }

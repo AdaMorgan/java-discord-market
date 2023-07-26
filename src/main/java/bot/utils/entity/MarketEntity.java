@@ -1,4 +1,4 @@
 package bot.utils.entity;
 
-public class MarketEntity {
+public class MarketEntity extends Entity {
 }
