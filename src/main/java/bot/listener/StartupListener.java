@@ -46,7 +46,7 @@ public class StartupListener extends ListenerAdapter {
                 .peek(category -> category.createTextChannel("info")
                         .queue(channel -> channel.sendMessageEmbeds(info().build()).setComponents(buttons()).queue()))
                 .peek(category -> category.createTextChannel("auction")
-                        .queue(channel -> this.app.controller.auction.put(guild.getIdLong(), channel.getIdLong())))
+                        .queue(channel -> this.app.controller.auctions.put(guild.getIdLong(), channel.getIdLong())))
 //                .peek(category -> category.createTextChannel("market").queue())
 //                .peek(category -> category.createTextChannel("trade").queue())
                 .close();

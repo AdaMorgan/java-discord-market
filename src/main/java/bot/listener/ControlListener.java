@@ -50,7 +50,7 @@ public class ControlListener extends ListenerAdapter {
 
     private MessageChannel getChannel(Controller controller, Guild guild, @NotNull ChannelType type) {
         return switch (type) {
-            case AUCTION -> guild.getTextChannelById(controller.auction.get(guild.getIdLong()));
+            case AUCTION -> guild.getTextChannelById(controller.auctions.get(guild.getIdLong()));
             case MARKET -> null;
             case TRADE -> null;
         };
