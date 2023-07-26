@@ -14,19 +14,23 @@ public class Application {
     public final JDA jda;
     public final Config config;
     public final Controller controller = new Controller(this);
+    public final StartupListener startup;
+    public final ControlListener control;
 
     public static void main(String[] args) {
         new Application(Config.readFromFile("config.toml"));
     }
 
     public Application(@NotNull Config config) {
+        this.control = new ControlListener(this);
+        this.startup = new StartupListener(this);
         this.config = config;
 
         jda = JDABuilder.createDefault(config.getToken())
                 .setStatus(OnlineStatus.ONLINE)
                 .enableIntents(GatewayIntent.MESSAGE_CONTENT)
-                .addEventListeners(new ControlListener(this))
-                .addEventListeners(new StartupListener(this))
+                .addEventListeners(startup)
+                .addEventListeners(control)
                 .build();
     }
 }

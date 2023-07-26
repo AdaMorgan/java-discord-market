@@ -1,6 +1,8 @@
 package bot.main;
 
 import com.moandjiezana.toml.Toml;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.FileReader;
 
@@ -23,6 +25,8 @@ public class Config {
         return content.getLong("user.limit", 5L).intValue();
     }
 
+    @NotNull
+    @Contract("_ -> new")
     public static Config readFromFile(String path) {
         try (FileReader reader = new FileReader(path)) {
             return new Config(new Toml().read(reader));

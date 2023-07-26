@@ -60,7 +60,7 @@ public class AuctionEntity extends Entity {
         removeMessage();
         this.status = StatusType.ENDING;
         getChannel().sendMessage("")
-                .setComponents(MessageUtil.getButtons())
+                .setComponents(MessageUtil.getAuctionButtons())
                 .queue(newMessage -> {
                     controller.entity.remove(this.message.getIdLong());
                     this.message = newMessage;

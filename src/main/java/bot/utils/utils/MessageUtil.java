@@ -18,13 +18,25 @@ public class MessageUtil {
     }
 
     @NotNull
-    public static List<ActionRow> getButtons() {
+    public static List<ActionRow> getAuctionButtons() {
         return List.of(
                 ActionRow.of(
                         Button.primary("bid:1", "+1"),
                         Button.primary("bid:10", "+10"),
                         Button.primary("bid:100", "+100"),
                         Button.secondary("bid:leave", "leave")
+                )
+        );
+    }
+
+    @NotNull
+    public static List<ActionRow> getInfoButtons() {
+        return List.of(
+                ActionRow.of(
+                        Button.primary("bid:auction", "Auction"),
+                        Button.primary("bid:market", "Market"),
+                        Button.primary("bid:trade", "Trade"),
+                        Button.primary("bid:remove", "Remove")
                 )
         );
     }
