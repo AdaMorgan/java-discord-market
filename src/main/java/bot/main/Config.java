@@ -15,6 +15,14 @@ public class Config {
         return content.getString("bot.token");
     }
 
+    public int getGuildLimit() {
+        return content.getLong("bot.limit", 1000L).intValue();
+    }
+
+    public int getItemLimit() {
+        return content.getLong("user.limit", 5L).intValue();
+    }
+
     public static Config readFromFile(String path) {
         try (FileReader reader = new FileReader(path)) {
             return new Config(new Toml().read(reader));
