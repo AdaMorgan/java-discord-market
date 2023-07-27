@@ -4,6 +4,7 @@ import bot.main.Application;
 import bot.utils.Controller;
 import bot.utils.entity.AuctionEntity;
 import bot.utils.type.ChannelType;
+import bot.utils.utils.InputUtil;
 import bot.utils.utils.MessageUtil;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -11,10 +12,13 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.session.ReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
+import net.dv8tion.jda.api.interactions.components.text.TextInput;
+import net.dv8tion.jda.api.interactions.modals.Modal;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
@@ -53,10 +57,32 @@ public class StartupListener extends ListenerAdapter {
         if (!id[0].equals("bid")) return;
 
         switch (id[1]) {
-            case "auction" -> add(event, control.getController(event.getGuild()), ChannelType.AUCTION);
+            case "auction" -> event.replyModal(test()).queue();
         }
 
         if (!event.isAcknowledged()) event.deferEdit().queue();
+    }
+
+    @Override
+    public void onModalInteraction(@NotNull ModalInteractionEvent event) {
+        String[] id = event.getModalId().split(":");
+
+        if (!id[0].equals("bot")) return;
+
+        switch (id[1]) {
+            case "auction" -> add(event, ChannelType.AUCTION);
+            case "market" -> add(event, ChannelType.MARKET);
+            case "trade" -> add(event, ChannelType.TRADE);
+        }
+
+        if (!event.isAcknowledged()) event.deferEdit().queue();
+    }
+
+    @NotNull
+    private Modal test() {
+        return Modal.create("bot:auction", "Create Auction Item")
+                .addActionRow(InputUtil.create("bot:auction", "Auction", "item").build())
+                .build();
     }
 
     private void createRole(Guild guild) {
@@ -111,7 +137,9 @@ public class StartupListener extends ListenerAdapter {
         }
     }
 
-    private void add(@NotNull IReplyCallback event, @NotNull Controller controller, ChannelType type) {
+    private void add(@NotNull IReplyCallback event, ChannelType type) {
+        Controller controller = control.getController(event.getGuild());
+
         if (controller.isItemLimit(event.getUser())) {
             getChannel(event.getGuild(), type).sendMessage("")
                     .setComponents(MessageUtil.getAuctionButtons())
