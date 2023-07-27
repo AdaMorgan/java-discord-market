@@ -3,7 +3,6 @@ package bot.utils.type;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 
 public enum EmojiType {
-
     BEGIN("begin", 1L),
     ENDING("ending", 1L);
 

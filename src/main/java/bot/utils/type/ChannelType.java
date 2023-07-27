@@ -2,8 +2,7 @@ package bot.utils.type;
 
 public enum ChannelType {
     AUCTION("auction"),
-    MARKET("market"),
-    TRADE("trade");
+    MARKET("market");
 
     private final String name;
 

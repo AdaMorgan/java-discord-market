@@ -31,20 +31,28 @@ public class ControlListener extends ListenerAdapter {
         requireController(event, event.getMessage(), entity -> {
             if (entity != null) {
                 if (entity instanceof AuctionEntity auctionEntity) {
-                    switch (id[1]) {
-                        case "1" -> auctionEntity.bid(event, 1);
-                        case "10" -> auctionEntity.bid(event, 10);
-                        case "100" -> auctionEntity.bid(event, 100);
-                        case "leave" -> auctionEntity.leave(event.getUser());
-                    }
+                    handleAuctionEntity(id[1], auctionEntity, event);
                 }
                 if (entity instanceof MarketEntity marketEntity) {
-                    switch (id[1]) {
-                        case "bay" -> marketEntity.bay();
-                    }
+                    handleMarketEntity(id[1], marketEntity, event);
                 }
             }
         });
+    }
+
+    private void handleAuctionEntity(@NotNull String id, AuctionEntity auctionEntity, ButtonInteractionEvent event) {
+        switch (id) {
+            case "1" -> auctionEntity.bid(event, 1);
+            case "10" -> auctionEntity.bid(event, 10);
+            case "100" -> auctionEntity.bid(event, 100);
+            case "leave" -> auctionEntity.leave(event.getUser());
+        }
+    }
+
+    private void handleMarketEntity(@NotNull String id, MarketEntity marketEntity, ButtonInteractionEvent event) {
+        switch (id) {
+            case "bay" -> marketEntity.bay(event.getUser());
+        }
     }
 
     public Controller getController(@NotNull Guild guild) {

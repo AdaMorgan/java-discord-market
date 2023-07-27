@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -19,12 +20,8 @@ public class Entity {
     public Controller controller;
     public Message message;
     public String item;
-    public Object leader;
-    public int price;
-    public int current;
-    public int time;
+    public int price, time;
     public User author;
-    public int bid;
 
     public final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
@@ -34,11 +31,8 @@ public class Entity {
         this.message = message;
         this.item = item;
         this.price = price;
-        this.leader = null;
-        this.current = 0;
         this.time = time;
         this.author = author;
-        this.bid = 0;
 
         scheduler.scheduleAtFixedRate(new TimerTask(this, time), 0, 1, TimeUnit.SECONDS);
     }
@@ -51,14 +45,11 @@ public class Entity {
         this.message.delete().queue();
     }
 
-    protected MessageEmbed embed() {
-        return null;
-    }
-
     public void stop() {
         removeMessage();
         this.controller.entity.remove(this.message.getIdLong());
-        this.author.openPrivateChannel().queue(channel -> channel.sendMessageEmbeds(embed()).queue());
+        this.author.openPrivateChannel().queue(channel -> channel.sendMessage(setFinalMessageByUser()).queue());
+        stopAfter();
         this.scheduler.shutdown();
     }
 
@@ -80,11 +71,19 @@ public class Entity {
         return String.format("%s %s", this.status.getText(), TimerUtil.getTime(this.time));
     }
 
-    protected void update() {
+    public void stopAfter() {
+        //...
+    }
 
+    protected void update() {
+        //...
     }
 
     public MessageEmbed message() {
+        return null;
+    }
+
+    protected MessageCreateData setFinalMessageByUser() {
         return null;
     }
 

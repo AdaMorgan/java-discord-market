@@ -2,7 +2,6 @@ package bot.utils.entity;
 
 import bot.utils.Controller;
 import bot.utils.utils.MessageUtil;
-import bot.utils.utils.TimerUtil;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -10,12 +9,14 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
 import net.dv8tion.jda.api.requests.ErrorResponse;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
+import net.dv8tion.jda.api.utils.messages.MessageEditData;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Comparator;
+import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 
 public class AuctionEntity extends Entity {
     public int current, bid;
@@ -39,11 +40,18 @@ public class AuctionEntity extends Entity {
     }
 
     @Override
-    public MessageEmbed embed() {
+    public MessageCreateData setFinalMessageByUser() {
         if (this.leader != null)
-            return new EmbedBuilder().setTitle("Winner: " + this.leader.getAsTag() + "/" + this.bid).build();
+            return MessageCreateData.fromContent("Won in an auction: " + this.leader.getName());
         else
-            return new EmbedBuilder().setTitle("No winner").build();
+            return MessageCreateData.fromContent("nobody participated in the auction");
+    }
+
+    @Override
+    public void stopAfter() {
+        this.leader.openPrivateChannel().queue(channel -> {
+            channel.sendMessage("You won an auction with the author " + this.author.getName()).queue();
+        });
     }
 
     public void bid(@NotNull IReplyCallback event, int value) {

@@ -5,7 +5,6 @@ import bot.utils.Controller;
 import bot.utils.entity.AuctionEntity;
 import bot.utils.entity.Entity;
 import bot.utils.entity.MarketEntity;
-import bot.utils.entity.TradeEntity;
 import bot.utils.type.ChannelType;
 import bot.utils.utils.InputUtil;
 import bot.utils.utils.MessageUtil;
@@ -20,18 +19,15 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.session.ReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
-import net.dv8tion.jda.api.interactions.modals.Modal;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class StartupListener extends ListenerAdapter {
     public final Application app;
     private final ControlListener control;
     public Map<Long, Long> auctions, markets, trades;
+    private final List<String> names = Arrays.asList("info", "auction", "market", "trade");
 
     public StartupListener(Application app) {
         this.app = app;
@@ -48,7 +44,6 @@ public class StartupListener extends ListenerAdapter {
 
     private void addController(@NotNull Guild guild) {
         this.app.controller.controllers.put(guild.getIdLong(), new Controller(this.app));
-
         createRole(guild);
     }
 
@@ -61,7 +56,6 @@ public class StartupListener extends ListenerAdapter {
         switch (id[1]) {
             case "auction" -> event.replyModal(InputUtil.auction()).queue();
             case "market" -> event.replyModal(InputUtil.market()).queue();
-            case "trade" -> event.replyModal(InputUtil.market()).queue();
         }
     }
 
@@ -74,7 +68,6 @@ public class StartupListener extends ListenerAdapter {
         switch (id[1]) {
             case "auction" -> add(event, ChannelType.AUCTION);
             case "market" -> add(event, ChannelType.MARKET);
-            case "trade" -> add(event, ChannelType.TRADE);
         }
 
         if (!event.isAcknowledged()) event.deferEdit().queue();
@@ -84,30 +77,37 @@ public class StartupListener extends ListenerAdapter {
         createCategory(guild);
     }
 
-    private void createCategory(@NotNull Guild guild) {
-        guild.getCategories().stream()
+    @NotNull
+    private Optional<Category> findTradeCategory(@NotNull Guild guild) {
+        return guild.getCategories().stream()
                 .filter(category -> category.getName().equalsIgnoreCase("trade"))
-                .findFirst()
-                .ifPresentOrElse(category -> getCategory(guild),
-                        () -> guild.createCategory("trade").queue(category -> createChannel(guild)));
+                .findFirst();
+    }
 
+    private void createTradeCategory(@NotNull Guild guild) {
+        guild.createCategory("trade").queue(category -> createChannel(guild));
+    }
+
+    private void updateStartupChannels(@NotNull Guild guild) {
         guild.getChannels().forEach(channel -> {
-            if (channel.getName().equalsIgnoreCase("auction"))
-                this.app.startup.auctions.put(guild.getIdLong(), channel.getIdLong());
-
-            if (channel.getName().equalsIgnoreCase("market"))
-                this.app.startup.markets.put(guild.getIdLong(), channel.getIdLong());
-
-            if (channel.getName().equalsIgnoreCase("trade"))
-                this.app.startup.trades.put(guild.getIdLong(), channel.getIdLong());
+            switch (channel.getName().toLowerCase()) {
+                case "auction" -> this.app.startup.auctions.put(guild.getIdLong(), channel.getIdLong());
+                case "market" -> this.app.startup.markets.put(guild.getIdLong(), channel.getIdLong());
+            }
         });
+    }
+
+    private void createCategory(@NotNull Guild guild) {
+        findTradeCategory(guild).ifPresentOrElse(
+                category -> getCategory(guild),
+                () -> createTradeCategory(guild)
+        );
+        updateStartupChannels(guild);
     }
 
     private void getCategory(@NotNull Guild guild) {
         guild.getCategoriesByName("trade", true).forEach(category -> createChannel(guild));
     }
-
-    private final List<String> names = Arrays.asList("info", "auction", "market", "trade");
 
     private void sendMessage(@NotNull TextChannel channel) {
         if (channel.getName().equalsIgnoreCase("info"))
@@ -117,19 +117,23 @@ public class StartupListener extends ListenerAdapter {
     }
 
     private void createChannel(@NotNull Guild guild) {
-        for (String name : names) {
-            guild.getCategories().forEach(category -> {
-                List<TextChannel> existingChannels = category.getTextChannels().stream()
-                        .filter(channel -> channel.getName().equalsIgnoreCase(name))
-                        .toList();
+        names.forEach(name -> guild.getCategories().forEach(category -> {
+            if (getExistingChannels(category.getTextChannels(), name).isEmpty()) {
+                createTextChannel(guild, name, category);
+            }
+        }));
+    }
 
-                if (existingChannels.isEmpty()) {
-                    guild.createTextChannel(name)
-                            .setParent(category)
-                            .queue(this::sendMessage);
-                }
-            });
-        }
+    private List<TextChannel> getExistingChannels(@NotNull List<TextChannel> channels, String name) {
+        return channels.stream()
+                .filter(channel -> channel.getName().equalsIgnoreCase(name))
+                .toList();
+    }
+
+    private void createTextChannel(@NotNull Guild guild, String name, Category category) {
+        guild.createTextChannel(name)
+                .setParent(category)
+                .queue(this::sendMessage);
     }
 
     private void add(@NotNull IReplyCallback event, ChannelType type) {
@@ -151,15 +155,13 @@ public class StartupListener extends ListenerAdapter {
         return switch (type) {
             case AUCTION -> guild.getTextChannelById(this.app.startup.auctions.get(guild.getIdLong()));
             case MARKET ->  guild.getTextChannelById(this.app.startup.markets.get(guild.getIdLong()));
-            case TRADE ->  guild.getTextChannelById(this.app.startup.trades.get(guild.getIdLong()));
         };
     }
 
-    private Entity getType(IReplyCallback event, Controller controller, Message message, ChannelType type) {
+    private Entity getType(IReplyCallback event, Controller controller, Message message, @NotNull ChannelType type) {
         return switch (type) {
             case AUCTION -> new AuctionEntity(controller, message, "item", 100, 10, event.getUser());
             case MARKET ->  new MarketEntity(controller, message, "item", 100, 10, event.getUser());
-            case TRADE ->  new TradeEntity(controller, message, "item", 100, 10, event.getUser());
         };
     }
 

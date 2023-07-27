@@ -22,7 +22,7 @@ public enum StatusType {
     }
 
     public String getRole() {
-        return role;
+        return this.role;
     }
 
     public String getText() {
