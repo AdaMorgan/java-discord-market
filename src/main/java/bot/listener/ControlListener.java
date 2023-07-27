@@ -3,6 +3,8 @@ package bot.listener;
 import bot.main.Application;
 import bot.utils.Controller;
 import bot.utils.entity.AuctionEntity;
+import bot.utils.entity.Entity;
+import bot.utils.entity.MarketEntity;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -26,25 +28,30 @@ public class ControlListener extends ListenerAdapter {
 
         if (!id[0].equals("bid")) return;
 
-        requireController(event, event.getMessage(), auction -> {
-            if (auction != null) {
-                switch (id[1]) {
-                    case "1" -> auction.bid(event, 1);
-                    case "10" -> auction.bid(event, 10);
-                    case "100" -> auction.bid(event, 100);
-                    case "leave" -> auction.leave(event.getUser());
+        requireController(event, event.getMessage(), entity -> {
+            if (entity != null) {
+                if (entity instanceof AuctionEntity auctionEntity) {
+                    switch (id[1]) {
+                        case "1" -> auctionEntity.bid(event, 1);
+                        case "10" -> auctionEntity.bid(event, 10);
+                        case "100" -> auctionEntity.bid(event, 100);
+                        case "leave" -> auctionEntity.leave(event.getUser());
+                    }
+                }
+                if (entity instanceof MarketEntity marketEntity) {
+                    switch (id[1]) {
+                        case "bay" -> marketEntity.bay();
+                    }
                 }
             }
         });
-
-        if (!event.isAcknowledged()) event.deferEdit().queue();
     }
 
     public Controller getController(@NotNull Guild guild) {
         return this.controllers.get(guild.getIdLong());
     }
 
-    public void requireController(@NotNull IReplyCallback event, @NotNull Message message, @NotNull Consumer<AuctionEntity> handler) {
+    public void requireController(@NotNull IReplyCallback event, @NotNull Message message, @NotNull Consumer<Entity> handler) {
         handler.accept(getController(event.getGuild()).entity.get(message.getIdLong()));
     }
 }

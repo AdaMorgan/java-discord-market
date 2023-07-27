@@ -1,5 +1,6 @@
 package bot.utils.utils;
 
+import bot.utils.type.ChannelType;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -37,6 +38,31 @@ public class MessageUtil {
                         Button.primary("bid:market", "Market"),
                         Button.primary("bid:trade", "Trade"),
                         Button.primary("bid:remove", "Remove")
+                )
+        );
+    }
+
+    @NotNull
+    public static List<ActionRow> getType(ChannelType type) {
+        return switch (type) {
+            case AUCTION -> getAuctionButtons();
+            case MARKET -> getMarketButtons();
+            case TRADE -> getTradeButtons();
+        };
+    }
+
+    private static List<ActionRow> getTradeButtons() {
+        return List.of(
+                ActionRow.of(
+                        Button.primary("bid:bay", "bay")
+                )
+        );
+    }
+
+    private static List<ActionRow> getMarketButtons() {
+        return List.of(
+                ActionRow.of(
+                        Button.primary("bid:bay", "bay")
                 )
         );
     }

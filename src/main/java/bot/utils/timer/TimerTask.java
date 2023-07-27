@@ -1,17 +1,15 @@
 package bot.utils.timer;
 
-import bot.utils.entity.AuctionEntity;
+import bot.utils.entity.Entity;
 
 public class TimerTask implements Runnable {
 
-    private final AuctionEntity auction;
-    private final int start;
+    private final Entity entity;
     private int current;
 
-    public TimerTask(AuctionEntity auction, int time) {
-        this.auction = auction;
-        this.start = time * 60 * 60;
-        this.current = time;
+    public TimerTask(Entity auction, int minutes) {
+        this.entity = auction;
+        this.current = minutes;
     }
 
     @Override
@@ -22,11 +20,11 @@ public class TimerTask implements Runnable {
     }
 
     public void stop() {
-        if (this.current <= 0) this.auction.stop();
+        if (this.current <= 0) this.entity.stop();
     }
 
     public void recreate() {
-        if (this.current == 5) this.auction.recreate();
+        if (this.current == 5) this.entity.recreate();
     }
 
     public String getCurrentTime() {

@@ -3,6 +3,9 @@ package bot.listener;
 import bot.main.Application;
 import bot.utils.Controller;
 import bot.utils.entity.AuctionEntity;
+import bot.utils.entity.Entity;
+import bot.utils.entity.MarketEntity;
+import bot.utils.entity.TradeEntity;
 import bot.utils.type.ChannelType;
 import bot.utils.utils.InputUtil;
 import bot.utils.utils.MessageUtil;
@@ -17,7 +20,6 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.session.ReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
-import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.modals.Modal;
 import org.jetbrains.annotations.NotNull;
 
@@ -57,10 +59,10 @@ public class StartupListener extends ListenerAdapter {
         if (!id[0].equals("bid")) return;
 
         switch (id[1]) {
-            case "auction" -> event.replyModal(test()).queue();
+            case "auction" -> event.replyModal(InputUtil.auction()).queue();
+            case "market" -> event.replyModal(InputUtil.market()).queue();
+            case "trade" -> event.replyModal(InputUtil.market()).queue();
         }
-
-        if (!event.isAcknowledged()) event.deferEdit().queue();
     }
 
     @Override
@@ -76,13 +78,6 @@ public class StartupListener extends ListenerAdapter {
         }
 
         if (!event.isAcknowledged()) event.deferEdit().queue();
-    }
-
-    @NotNull
-    private Modal test() {
-        return Modal.create("bot:auction", "Create Auction Item")
-                .addActionRow(InputUtil.create("bot:auction", "Auction", "item").build())
-                .build();
     }
 
     private void createRole(Guild guild) {
@@ -141,11 +136,11 @@ public class StartupListener extends ListenerAdapter {
         Controller controller = control.getController(event.getGuild());
 
         if (controller.isItemLimit(event.getUser())) {
-            getChannel(event.getGuild(), type).sendMessage("")
-                    .setComponents(MessageUtil.getAuctionButtons())
+            getChannel(event.getGuild(), type).sendMessage("@New Item")
+                    .setComponents(MessageUtil.getType(type))
                     .queue(message -> {
                         controller.channels.put(message.getIdLong(), getChannel(event.getGuild(), type));
-                        createAuction(controller, message, new AuctionEntity(controller, message, "item", 100, 10, event.getUser()));
+                        create(controller, message, getType(event, controller, message, type));
                     });
         } else {
             event.reply("Limit!").setEphemeral(true).queue();
@@ -160,9 +155,17 @@ public class StartupListener extends ListenerAdapter {
         };
     }
 
-    private void createAuction(@NotNull Controller controller, @NotNull Message message, @NotNull AuctionEntity item) {
-        message.editMessageEmbeds(item.message()).queue();
-        controller.entity.put(message.getIdLong(), item);
+    private Entity getType(IReplyCallback event, Controller controller, Message message, ChannelType type) {
+        return switch (type) {
+            case AUCTION -> new AuctionEntity(controller, message, "item", 100, 10, event.getUser());
+            case MARKET ->  new MarketEntity(controller, message, "item", 100, 10, event.getUser());
+            case TRADE ->  new TradeEntity(controller, message, "item", 100, 10, event.getUser());
+        };
+    }
+
+    private void create(@NotNull Controller controller, @NotNull Message message, @NotNull Entity entity) {
+        message.editMessageEmbeds(entity.message()).queue();
+        controller.entity.put(message.getIdLong(), entity);
     }
 
     private void setPermissionCategory(@NotNull Guild guild, @NotNull Category category, String name) {

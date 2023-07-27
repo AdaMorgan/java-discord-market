@@ -16,9 +16,16 @@ public class InputUtil {
     }
 
     @NotNull
-    public static Modal modal(String id, String title, TextInput... inputs) {
-        return Modal.create(id, title)
-                .addActionRow(inputs)
+    public static Modal auction() {
+        return Modal.create("bot:auction", "Create Auction Item")
+                .addActionRow(InputUtil.create("bot:auction", "Auction", "item").build())
+                .build();
+    }
+
+    @NotNull
+    public static Modal market() {
+        return Modal.create("bot:market", "Create Market Item")
+                .addActionRow(InputUtil.create("bot:market", "Market", "item").build())
                 .build();
     }
 }
