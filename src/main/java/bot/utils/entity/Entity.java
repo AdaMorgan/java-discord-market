@@ -2,6 +2,7 @@ package bot.utils.entity;
 
 import bot.utils.Controller;
 import bot.utils.timer.TimerTask;
+import bot.utils.type.ChannelType;
 import bot.utils.type.StatusType;
 import bot.utils.utils.MessageUtil;
 import bot.utils.utils.TimerUtil;
@@ -9,13 +10,17 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
+import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class Entity {
+    private ChannelType type;
     public StatusType status;
     public Controller controller;
     public Message message;
@@ -27,6 +32,7 @@ public class Entity {
 
     public Entity(Controller controller, Message message, String item, int price, int time, User author) {
         this.status = StatusType.BEGIN;
+        this.type = setType();
         this.controller = controller;
         this.message = message;
         this.item = item;
@@ -53,18 +59,36 @@ public class Entity {
         this.scheduler.shutdown();
     }
 
-    public void recreate() {
+    public void recreate(StatusType type) {
         removeMessage();
+        this.status = type;
+        sendMessage();
+    }
 
-        this.status = StatusType.ENDING;
-        getChannel().sendMessage("")
-                .setComponents(MessageUtil.getAuctionButtons())
-                .queue(newMessage -> {
-                    controller.entity.remove(this.message.getIdLong());
-                    this.message = newMessage;
-                    this.update();
-                    controller.entity.put(newMessage.getIdLong(), this);
-                });
+    private void sendMessage() {
+        getChannel().sendMessage(getStatusMessage()).setComponents(getType()).queue(this::updateMessage);
+    }
+
+    private String getStatusMessage() {
+        return this.status == StatusType.BEGIN ? "" : StatusType.ENDING.getRole();
+    }
+
+    private void updateMessage(@NotNull Message newMessage) {
+        controller.entity.remove(this.message.getIdLong());
+        this.message = newMessage;
+        this.update();
+        controller.entity.put(newMessage.getIdLong(), this);
+    }
+
+    private List<ActionRow> getType() {
+        if (this.type == ChannelType.AUCTION)
+            return MessageUtil.getAuctionButtons();
+        else
+            return MessageUtil.getMarketButtons();
+    }
+
+    protected ChannelType setType() {
+        return type;
     }
 
     protected String setTitle() {

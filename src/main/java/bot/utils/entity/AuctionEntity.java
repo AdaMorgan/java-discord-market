@@ -1,6 +1,7 @@
 package bot.utils.entity;
 
 import bot.utils.Controller;
+import bot.utils.type.ChannelType;
 import bot.utils.utils.MessageUtil;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
@@ -37,6 +38,11 @@ public class AuctionEntity extends Entity {
         this.current = getLeader() != null ? this.users.get(getLeader()) : 0;
         this.leader = getLeader();
         this.message.editMessageEmbeds(message()).queue(null, new ErrorHandler().ignore(ErrorResponse.UNKNOWN_MESSAGE));
+    }
+
+    @Override
+    protected ChannelType setType() {
+        return ChannelType.AUCTION;
     }
 
     @Override

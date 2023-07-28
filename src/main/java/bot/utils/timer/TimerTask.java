@@ -1,6 +1,7 @@
 package bot.utils.timer;
 
 import bot.utils.entity.Entity;
+import bot.utils.type.StatusType;
 
 public class TimerTask implements Runnable {
 
@@ -24,7 +25,7 @@ public class TimerTask implements Runnable {
     }
 
     public void recreate() {
-        if (this.current == 5) this.entity.recreate();
+        if (this.current == 5) this.entity.recreate(StatusType.ENDING);
     }
 
     public String getCurrentTime() {

@@ -80,7 +80,7 @@ public class MessageUtil {
         };
     }
 
-    private static List<ActionRow> getMarketButtons() {
+    public static List<ActionRow> getMarketButtons() {
         return List.of(
                 ActionRow.of(
                         Button.primary("bid:bay", "bay")
@@ -94,7 +94,6 @@ public class MessageUtil {
                 ActionRow.of(
                         Button.primary("bid:auction", "Auction"),
                         Button.primary("bid:market", "Market"),
-                        Button.primary("bid:trade", "Trade"),
                         Button.primary("bid:remove", "Remove")
                 )
         );

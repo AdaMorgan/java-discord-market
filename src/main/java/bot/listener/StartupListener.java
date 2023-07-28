@@ -11,17 +11,23 @@ import bot.utils.utils.MessageUtil;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.events.session.ReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
+import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
+import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
+import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class StartupListener extends ListenerAdapter {
     public final Application app;
@@ -56,6 +62,7 @@ public class StartupListener extends ListenerAdapter {
         switch (id[1]) {
             case "auction" -> event.replyModal(InputUtil.auction()).queue();
             case "market" -> event.replyModal(InputUtil.market()).queue();
+            case "remove" -> createSelectMenu(event, event.getUser());
         }
     }
 
@@ -71,6 +78,15 @@ public class StartupListener extends ListenerAdapter {
         }
 
         if (!event.isAcknowledged()) event.deferEdit().queue();
+    }
+
+    @Override
+    public void onStringSelectInteraction(StringSelectInteractionEvent event) {
+        listItems(event.getGuild(), event.getUser())
+                .forEach(entity -> {
+                    removeItem(event.getGuild(), event.getUser(), event.getValues().get(0));
+                    event.reply("item removed").setEphemeral(true).closeResources().queue();
+                });
     }
 
     private void createRole(Guild guild) {
@@ -95,6 +111,41 @@ public class StartupListener extends ListenerAdapter {
                 case "market" -> this.app.startup.markets.put(guild.getIdLong(), channel.getIdLong());
             }
         });
+    }
+
+    //
+    private void removeItem(Guild guild, User user, String id) {
+        System.out.println(id);
+        listItems(guild, user).stream()
+                .filter(entity -> entity.message.getId().equals(id))
+                .forEach(Entity::stop);
+    }
+
+    private void createSelectMenu(@NotNull IReplyCallback event, User user) {
+        if (!listItems(event.getGuild(), user).isEmpty())
+            event.reply("Select item to delete!").setEphemeral(true).addActionRow(createMenu(event.getGuild(), event.getUser())).queue();
+        else
+            event.reply("You don't have auctions").setEphemeral(true).queue();
+    }
+
+    @NotNull
+    private SelectMenu createMenu(Guild guild, User user) {
+        return StringSelectMenu.create("bot:items")
+                .addOptions(optionsItems(guild, user))
+                .build();
+    }
+
+    private List<Entity> listItems(Guild guild, User user) {
+        return this.app.control.getController(guild).entity.values().stream()
+                .filter(entity -> entity.author.equals(user))
+                .collect(Collectors.toList());
+    }
+
+    @NotNull
+    private SelectOption[] optionsItems(Guild guild, User user) {
+        return listItems(guild, user).stream()
+                .map(entity -> SelectOption.of(entity.item, entity.message.getId()))
+                .toArray(SelectOption[]::new);
     }
 
     private void createCategory(@NotNull Guild guild) {
@@ -137,18 +188,19 @@ public class StartupListener extends ListenerAdapter {
     }
 
     private void add(@NotNull IReplyCallback event, ChannelType type) {
-        Controller controller = control.getController(event.getGuild());
-
-        if (controller.isItemLimit(event.getUser())) {
-            getChannel(event.getGuild(), type).sendMessage("@New Item")
-                    .setComponents(MessageUtil.getType(type))
-                    .queue(message -> {
-                        controller.channels.put(message.getIdLong(), getChannel(event.getGuild(), type));
-                        create(controller, message, getType(event, controller, message, type));
-                    });
-        } else {
+        if (control.getController(event.getGuild()).isItemLimit(event.getUser()))
+            createItem(event, control.getController(event.getGuild()), type);
+        else
             event.reply("Limit!").setEphemeral(true).queue();
-        }
+    }
+
+    private void createItem(@NotNull IReplyCallback event, Controller controller, ChannelType type) {
+        getChannel(event.getGuild(), type).sendMessage("@New Item")
+                .setComponents(MessageUtil.getType(type))
+                .queue(message -> {
+                    controller.channels.put(message.getIdLong(), getChannel(event.getGuild(), type));
+                    create(controller, message, getType(event, controller, message, type));
+                });
     }
 
     private MessageChannel getChannel(Guild guild, @NotNull ChannelType type) {
@@ -160,8 +212,8 @@ public class StartupListener extends ListenerAdapter {
 
     private Entity getType(IReplyCallback event, Controller controller, Message message, @NotNull ChannelType type) {
         return switch (type) {
-            case AUCTION -> new AuctionEntity(controller, message, "item", 100, 10, event.getUser());
-            case MARKET ->  new MarketEntity(controller, message, "item", 100, 10, event.getUser());
+            case AUCTION -> new AuctionEntity(controller, message, "item", 100, 30, event.getUser());
+            case MARKET ->  new MarketEntity(controller, message, "item", 100, 30, event.getUser());
         };
     }
 
