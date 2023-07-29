@@ -6,7 +6,7 @@ import bot.utils.type.StatusType;
 public class TimerTask implements Runnable {
 
     private final Entity entity;
-    private int current;
+    private long current;
 
     public TimerTask(Entity auction, int minutes) {
         this.entity = auction;
@@ -28,7 +28,7 @@ public class TimerTask implements Runnable {
         if (this.current == 5) this.entity.recreate(StatusType.ENDING);
     }
 
-    public String getCurrentTime() {
-        return String.valueOf(this.current);
+    public long getCurrentTime() {
+        return this.current;
     }
 }

@@ -73,11 +73,53 @@ public class StartupListener extends ListenerAdapter {
         if (!id[0].equals("bot")) return;
 
         switch (id[1]) {
-            case "auction" -> add(event, ChannelType.AUCTION);
-            case "market" -> add(event, ChannelType.MARKET);
+            case "auction" -> add(event, ChannelType.AUCTION,
+                    event.getValue("bot:auction.title").getAsString(),
+                    event.getValue("bot:auction.description").getAsString(),
+                    event.getValue("bot:auction.price").getAsString(),
+                    event.getValue("bot:auction.time").getAsString());
+
+            case "market" -> add(event, ChannelType.MARKET,
+                    event.getValue("bot:market.title").getAsString(),
+                    event.getValue("bot:market.description").getAsString(),
+                    event.getValue("bot:market.price").getAsString(),
+                    event.getValue("bot:market.time").getAsString());
         }
 
         if (!event.isAcknowledged()) event.deferEdit().queue();
+    }
+
+    private void add(@NotNull IReplyCallback event, ChannelType type, String title, String description, Object price, Object hours) {
+        if (control.getController(event.getGuild()).isItemLimit(event.getUser())) {
+            try {
+                int p = Integer.parseInt((String) price);
+                int h = Integer.parseInt((String) hours);
+                checkItem(event, type, title, description, p, h);
+            } catch (NumberFormatException exception) {
+                event.reply("incorrect text formatting").setEphemeral(true).queue();
+            }
+        } else {
+            event.reply("Limit!").setEphemeral(true).queue();
+        }
+    }
+
+    private void checkItem(@NotNull IReplyCallback event, ChannelType type, String title, String description, int price, int hours) {
+        if (hours <= 144 && hours >= 8)
+            if (price >= 0)
+                createItem(event, control.getController(event.getGuild()), type, title, description, price, hours);
+            else
+                event.reply("price must be >= 0").setEphemeral(true).queue();
+        else
+            event.reply("The maximum time is 144 hours and the minimum is 8 hours").setEphemeral(true).queue();
+    }
+
+    private void createItem(@NotNull IReplyCallback event, Controller controller, ChannelType type, String title, String description, int price, int hours) {
+        getChannel(event.getGuild(), type).sendMessage("@New Item")
+                .setComponents(MessageUtil.getType(type))
+                .queue(message -> {
+                    controller.channels.put(message.getIdLong(), getChannel(event.getGuild(), type));
+                    create(controller, message, getType(event, controller, message, type, title, description, price, hours));
+                });
     }
 
     @Override
@@ -113,9 +155,7 @@ public class StartupListener extends ListenerAdapter {
         });
     }
 
-    //
     private void removeItem(Guild guild, User user, String id) {
-        System.out.println(id);
         listItems(guild, user).stream()
                 .filter(entity -> entity.message.getId().equals(id))
                 .forEach(Entity::stop);
@@ -169,9 +209,8 @@ public class StartupListener extends ListenerAdapter {
 
     private void createChannel(@NotNull Guild guild) {
         names.forEach(name -> guild.getCategories().forEach(category -> {
-            if (getExistingChannels(category.getTextChannels(), name).isEmpty()) {
+            if (getExistingChannels(category.getTextChannels(), name).isEmpty())
                 createTextChannel(guild, name, category);
-            }
         }));
     }
 
@@ -187,22 +226,6 @@ public class StartupListener extends ListenerAdapter {
                 .queue(this::sendMessage);
     }
 
-    private void add(@NotNull IReplyCallback event, ChannelType type) {
-        if (control.getController(event.getGuild()).isItemLimit(event.getUser()))
-            createItem(event, control.getController(event.getGuild()), type);
-        else
-            event.reply("Limit!").setEphemeral(true).queue();
-    }
-
-    private void createItem(@NotNull IReplyCallback event, Controller controller, ChannelType type) {
-        getChannel(event.getGuild(), type).sendMessage("@New Item")
-                .setComponents(MessageUtil.getType(type))
-                .queue(message -> {
-                    controller.channels.put(message.getIdLong(), getChannel(event.getGuild(), type));
-                    create(controller, message, getType(event, controller, message, type));
-                });
-    }
-
     private MessageChannel getChannel(Guild guild, @NotNull ChannelType type) {
         return switch (type) {
             case AUCTION -> guild.getTextChannelById(this.app.startup.auctions.get(guild.getIdLong()));
@@ -210,10 +233,13 @@ public class StartupListener extends ListenerAdapter {
         };
     }
 
-    private Entity getType(IReplyCallback event, Controller controller, Message message, @NotNull ChannelType type) {
+    private Entity getType(
+            IReplyCallback event, Controller controller, Message message, @NotNull ChannelType type,
+            String item, String description, int price, int hours
+    ) {
         return switch (type) {
-            case AUCTION -> new AuctionEntity(controller, message, "item", 100, 30, event.getUser());
-            case MARKET ->  new MarketEntity(controller, message, "item", 100, 30, event.getUser());
+            case AUCTION -> new AuctionEntity(controller, message, item, description, price, hours, event.getUser());
+            case MARKET ->  new MarketEntity(controller, message, item, description, price, hours, event.getUser());
         };
     }
 

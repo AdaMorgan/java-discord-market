@@ -13,9 +13,11 @@ import org.jetbrains.annotations.NotNull;
 
 public class MarketEntity extends Entity {
     private User buyer;
+    private final String description;
 
-    public MarketEntity(Controller controller, Message message, String item, int price, int time, User author) {
+    public MarketEntity(Controller controller, Message message, String item, String description, int price, int time, User author) {
         super(controller, message, item, price, time, author);
+        this.description = description;
         this.buyer = null;
     }
 
@@ -38,7 +40,12 @@ public class MarketEntity extends Entity {
     }
 
     @Override
-    protected void update() {
+    public void stopAfter() {
+
+    }
+
+    @Override
+    public void update() {
         this.message.editMessageEmbeds(message()).queue(null, new ErrorHandler().ignore(ErrorResponse.UNKNOWN_MESSAGE));
     }
 
@@ -55,6 +62,7 @@ public class MarketEntity extends Entity {
                 .setAuthor(setTitle())
                 .setTitle(this.item)
                 .setColor(this.status.getColor())
+                .setDescription(this.description)
                 .addField("**Price** @\n", String.valueOf(this.price), true)
                 .setFooter("ID: " + this.message.getIdLong())
                 .build();

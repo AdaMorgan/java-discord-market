@@ -20,13 +20,15 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class AuctionEntity extends Entity {
+    private final String description;
     public int current, bid;
 
     public final Map<User, Integer> users = new ConcurrentHashMap<>();
     public User leader;
 
-    public AuctionEntity(Controller controller, Message message, String item, int start, int time, User author) {
+    public AuctionEntity(Controller controller, Message message, String item, String description, int start, int time, User author) {
         super(controller, message, item, start, time, author);
+        this.description = description;
         this.price = start;
         this.leader = null;
         this.current = 0;
@@ -67,7 +69,12 @@ public class AuctionEntity extends Entity {
             event.reply("You author!").setEphemeral(true).queue();
     }
 
-    private void bidAfter(IReplyCallback event, int value) {
+    //TODO: if during the last 5 minutes of the auction, someone raised the bid, then the auction will last another 5 minutes
+    private void extension() {
+
+    }
+
+    private void bidAfter(@NotNull IReplyCallback event, int value) {
         intercepted(event.getUser());
         this.users.put(event.getUser(), getMaxPrice(value));
         this.update();
@@ -91,7 +98,7 @@ public class AuctionEntity extends Entity {
         return users.values().stream().max(Comparator.naturalOrder()).get();
     }
 
-    private User getLeader() {
+    public User getLeader() {
         return users.entrySet()
                 .stream()
                 .max(Comparator.comparingInt(Map.Entry::getValue))
@@ -113,8 +120,9 @@ public class AuctionEntity extends Entity {
     public synchronized MessageEmbed message() {
         return new EmbedBuilder()
                 .setAuthor(setTitle())
-                .setTitle(getTitle())
+                .setTitle(this.item)
                 .setColor(this.status.getColor())
+                .setDescription(this.description)
                 .addField("**Starting** @\n", String.valueOf(this.price), true)
                 .addField("**Current Bid:**\n", String.valueOf(this.current), true)
                 .setFooter("ID: " + this.message.getIdLong())

@@ -19,8 +19,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-public class Entity {
-    private ChannelType type;
+public abstract class Entity {
+    private final ChannelType type;
+    private final TimerTask timer;
     public StatusType status;
     public Controller controller;
     public Message message;
@@ -39,8 +40,9 @@ public class Entity {
         this.price = price;
         this.time = time;
         this.author = author;
+        this.timer = new TimerTask(this, time);
 
-        scheduler.scheduleAtFixedRate(new TimerTask(this, time), 0, 1, TimeUnit.SECONDS);
+        scheduler.scheduleAtFixedRate(this.timer, 0, 1, TimeUnit.SECONDS);
     }
 
     private MessageChannel getChannel() {
@@ -92,23 +94,14 @@ public class Entity {
     }
 
     protected String setTitle() {
-        return String.format("%s %s", this.status.getText(), TimerUtil.getTime(this.time));
+        return String.format("%s %s %s", this.status.getText(), TimerUtil.getExpiredTime(this.time), TimerUtil.getElementTime(this.timer.getCurrentTime()));
     }
 
-    public void stopAfter() {
-        //...
-    }
+    public abstract void stopAfter();
 
-    protected void update() {
-        //...
-    }
+    public abstract void update();
 
-    public MessageEmbed message() {
-        return null;
-    }
+    public abstract MessageEmbed message();
 
-    protected MessageCreateData setFinalMessageByUser() {
-        return null;
-    }
-
+    protected abstract MessageCreateData setFinalMessageByUser();
 }
